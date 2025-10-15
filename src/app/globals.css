@@ -13,3 +13,14 @@ body {
   flex-direction: column;
   align-items: center;
 }
+
+.browse-button{
+  background-color: #cfcece;
+  color: rgb(28, 27, 27);
+  
+}
+
+.browse-button:hover{
+    background-color: #cfcece;
+    color: rgb(28, 27, 27);
+}

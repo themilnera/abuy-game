@@ -8,6 +8,7 @@ import {
   mantineHtmlProps,
 } from "@mantine/core";
 import "./globals.css";
+import Header from "@/components/header";
 
 export const metadata: Metadata = {
   title: "ABUY.com",
@@ -27,7 +28,10 @@ export default function RootLayout({
         <ColorSchemeScript />
       </head>
       <body className={`${inter.className} antialiased`}>
-        <MantineProvider>{children}</MantineProvider>
+        <MantineProvider>
+          <Header/>
+          {children}
+        </MantineProvider>
       </body>
     </html>
   );
