@@ -26,20 +26,20 @@ export default function Header() {
           </div>
 
           <div className="flex gap-10">
-            <Link href="/" className="hover:underline hover:underline-offset-3">Deals of the Day</Link>
-            <Link href="/" className="hover:underline hover:underline-offset-3">Need Help?</Link>
+            <Link href="/deals" className="hover:underline hover:underline-offset-3">Deals of the Day</Link>
+            <Link href="/help" className="hover:underline hover:underline-offset-3">Need Help?</Link>
           </div>
 
           <div className="flex gap-5 ml-auto mr-5">
-            <Link href="/">Sell</Link>
-            <Link href="/">My Bids</Link>
+            <Link href="/sell">Sell</Link>
+            <Link href="/my-bids">My Bids</Link>
             <Tooltip label="Notifications" offset={1}>
-              <Link href="/">
+              <Link href="/notifications">
                 <IconBell />
               </Link>
             </Tooltip>
             <Tooltip label="My shopping cart" offset={1}>
-              <Link href="/">
+              <Link href="/cart">
                 <IconShoppingCart />
               </Link>
             </Tooltip>
