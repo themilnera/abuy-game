@@ -3,9 +3,9 @@ import { Button, Image, Text, Typography } from "@mantine/core";
 export default function SpecialOffer(){
     return (
         <>
-          <div className="feat-daily-deal w-[70vw] h-[30vh] bg-green-950 rounded-3xl flex items-center justify-end pt-5 pb-5 pl-30 pr-30">
+          <div className="feat-daily-deal w-[70vw] h-[30vh] bg-green-950 rounded-3xl flex items-center justify-end pt-5 pb-5 pl-5 pr-5 md:pl-30 md:pr-30">
             <div className="self-start mr-auto break-words w-100 h-[100%] flex flex-col">
-              <Text className="text-4xl!" c={"#8ecc77"} fw={900}>
+              <Text className="text-2xl! md:text-4xl!" c={"#8ecc77"} fw={900}>
                 Special Offer
               </Text>
     
@@ -18,10 +18,11 @@ export default function SpecialOffer(){
               </p>
             </div>
             <Image
-              className="mr-5"
+              className="ml-2 invisible md:visible"
               radius={"lg"}
               w={"30%"}
-              h="100%"
+              
+              
               src={
                 "https://images.pexels.com/photos/34317747/pexels-photo-34317747.jpeg"
               }

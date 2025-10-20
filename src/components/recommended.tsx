@@ -50,11 +50,12 @@ interface CardProps {
 
 function Card({ name, description, price, imageUrl }: CardProps) {
   return (
-    <Paper radius="lg" bg={"#cfcece"} className="h-80! flex! flex-col! items-center">
+    <Paper radius="lg" bg={"#cfcece"} className="h-60 md:h-80! flex! flex-col! items-center">
       <div className="h-[80%] w-full overflow-hidden rounded-lg flex-shrink-0">
-        <Image 
+        <Image
+        className="h-[100%]" 
           src={imageUrl} 
-          h="100%" 
+
           w="100%" 
           fit="cover" 
           alt={name}
@@ -82,7 +83,7 @@ export default function Recommended() {
       <div className="mt-10">
         <Text fw={700} ml={30} mb={10} fz={20}>Recommended for you</Text>
         <Carousel
-          slideSize="25%"
+          slideSize={{sm: `25%`, base: '50%'}}
           height={350}
           w={`70vw`}
           slideGap="md"

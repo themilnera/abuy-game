@@ -24,3 +24,10 @@ body {
     background-color: #cfcece;
     color: rgb(28, 27, 27);
 }
+
+.control {
+  &[data-inactive] {
+    opacity: 0;
+    cursor: default;
+  }
+}
