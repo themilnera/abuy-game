@@ -7,9 +7,9 @@ import Recommended from "@/components/recommended";
 
 export default function Home() {
   return (
-    <>
+    <div className="flex flex-col items-center">
       <SpecialOffer />
       <Recommended />
-    </>
+    </div>
   );
 }
