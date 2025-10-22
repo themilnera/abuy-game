@@ -75,11 +75,13 @@ export default function CreateProduct() {
           path: path,
           description: description,
         });
-        console.log("Submitted product to database: ", result);
         setResultData(result.data);
+
         setResults(true);
         open();
         clearAllFields();
+
+        console.log("Submitted product to database: ", result);
       } else {
         const result = await axios.put(`/api/products/${productId}`, {
           name: name,
@@ -352,7 +354,6 @@ export default function CreateProduct() {
                 category?.trim() == "" ||
                 lowestPrice === 0 ||
                 highestPrice === 0 ||
-                rarity === 0 ||
                 path?.trim() === "" ||
                 description?.trim() === ""
                   ? true
@@ -362,7 +363,17 @@ export default function CreateProduct() {
             >
               {submitText}
             </Button>
+            { 
+          !newProduct ? (
+            <Button onClick={clearAllFields} color="#6d6234">Reset</Button>
+            )
+          : 
+           (<>
+           
+           </>)
+          }
           </div>
+          
         </div>
       </div>
     </>
