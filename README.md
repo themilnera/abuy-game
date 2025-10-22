@@ -1,36 +1,25 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ABUY
 
-## Getting Started
+ABUY is (will be) satirical management sim game/website inspired by old school Ebay.
 
-First, run the development server:
+**Can you buy, auction and sell your way to profit?**
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Tech Stack
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+This project uses:
+- Typescript
+- NextJS
+- Tailwind
+- PostgreSQL
+- Mantine component library
+- Tabler icons
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Goals
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- A detailed shopping site simulation that allows you to buy virtual items with virtual money, and resell them on a virtual market.
+- Game-y randomness like market trends, item sales, new product releases, etc.
+- Rewards like acheivement badges and exclusive deals for success.
 
-## Learn More
+## Status
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This is currently a work in progress, and isn't too far along yet. I'm not sure how big and complex this site will really be, I've never made anything like this before, but I'm going to focus on it for a while and try to get it to a functional point before I move on to any other projects.
