@@ -5,9 +5,16 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
+interface Context {
+  params: {
+    id: string;
+  };
+}
+
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } } 
+  //destructure  { params }: from an object { which contains params: { which is an object with value id: which is a string }}
 ) {
   try {
     const { id } = await params;

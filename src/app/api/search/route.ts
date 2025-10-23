@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
     const { category, query } = body;
 
     if (!category && !query) {
-      return NextResponse.json("No results.");
+      return NextResponse.json([]);
     }
 
     if (!category) {
@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
         [`%${query}%`]
       );
       if (result.rows.length === 0) {
-        return NextResponse.json("No results.");
+        return NextResponse.json([]);
       }
       return NextResponse.json(result.rows);
     } else {
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
         [`%${query}%`, category]
       );
       if (result.rows.length === 0) {
-        return NextResponse.json("No results.");
+        return NextResponse.json([]);
       }
       return NextResponse.json(result.rows);
     }

@@ -17,17 +17,8 @@ import {
 import { useState } from "react";
 import axios from "axios";
 import { useDisclosure } from "@mantine/hooks";
+import { Product } from "@/interfaces";
 
-interface Product {
-  id: string;
-  name: string;
-  category: string;
-  lowest_price: number;
-  highest_price: number;
-  rarity: number;
-  path: string;
-  description: string;
-}
 
 export default function CreateProduct() {
   //CREATE PRODUCT

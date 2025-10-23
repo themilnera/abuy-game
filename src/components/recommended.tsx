@@ -3,52 +3,48 @@
 import SpecialOffer from "@/components/special-offer";
 import { Button, Image, Paper, Text, Typography } from "@mantine/core";
 import { Carousel } from "@mantine/carousel";
+import { CardProps } from "@/interfaces"
 const dummyData = [
   {
     name: "Magic laptop",
-    description: "laptop with actual magical ability",
     price: 200,
     imageUrl:
       "https://images.pexels.com/photos/33829025/pexels-photo-33829025.jpeg",
+      id: '0',
   },
   {
     name: "Deer (doe)",
-    description: "A doe, a female deer",
     price: 20,
     imageUrl:
       "https://images.pexels.com/photos/33820045/pexels-photo-33820045.jpeg",
+      id: '0',
   },
   {
     name: "Some flower",
-    description: "Some kind of flower",
     price: 19,
     imageUrl:
       "https://images.pexels.com/photos/33618756/pexels-photo-33618756.jpeg",
+      id: '0',
   },
   {
     name: "YouTube.com",
-    description: "the website YouTube.com",
     price: 20000000000,
     imageUrl:
       "https://images.pexels.com/photos/33440278/pexels-photo-33440278.jpeg",
+      id: '0',
   },
   {
     name: "Airplane",
-    description: "An airplane",
     price: 200,
     imageUrl:
       "https://images.pexels.com/photos/34303415/pexels-photo-34303415.jpeg",
+      id: '0',
   },
 ];
 
-interface CardProps {
-  name: string;
-  description: string;
-  price: number;
-  imageUrl: string;
-}
 
-function Card({ name, description, price, imageUrl }: CardProps) {
+
+function Card({ name, price, imageUrl, id }: CardProps) {
   return (
     <Paper radius="lg" bg={"#cfcece"} className="h-60 md:h-80! flex! flex-col! items-center">
       <div className="h-[80%] w-full overflow-hidden rounded-lg flex-shrink-0">
