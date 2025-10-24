@@ -119,22 +119,22 @@ export default function Header() {
                   </Menu.Target>
                   <Menu.Dropdown>
                     <Menu.Item>
-                      <Link href="/browse/apparel" className="text-sm">
+                      <Link href="/search?q=&category=apparel&page=1" className="text-sm">
                         Apparel
                       </Link>
                     </Menu.Item>
                     <Menu.Item>
-                      <Link href="/browse/electronics" className="text-sm">
+                      <Link href="/search?q=&category=electronics&page=1" className="text-sm">
                         Electronics
                       </Link>
                     </Menu.Item>
                     <Menu.Item>
-                      <Link href="/browse/books" className="text-sm">
+                      <Link href="/search?q=&category=books&page=1" className="text-sm">
                         Books
                       </Link>
                     </Menu.Item>
                     <Menu.Item>
-                      <Link href="/browse/misc" className="text-sm">
+                      <Link href="/search?q=&category=misc&page=1" className="text-sm">
                         Misc
                       </Link>
                     </Menu.Item>
