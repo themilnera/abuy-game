@@ -10,32 +10,44 @@ import {
   IconShoppingCart,
 } from "@tabler/icons-react";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function Header() {
-  const location = usePathname();
   const hiddenHeaderRoutes = ["/admin/create-product"];
   const [searchBarInFocus, setSearchBarInFocus] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchCategory, setSearchCategory] = useState("Category");
+  const location = usePathname();
   const router = useRouter();
+
+  useEffect(() => {
+    console.log(location);
+    if (location !== "/search" && !location.match(/product/)) {
+      setSearchTerm("");
+      setSearchCategory("Category");
+    }
+  }, [location]);
 
   const encodeURIAndPushToSearchPage = () => {
     if (searchTerm.trim() !== "") {
       const _st = searchTerm;
       const encodedSearchTerm = encodeURIComponent(searchTerm);
       if (searchCategory !== "Category") {
-        const encodedCategory = encodeURIComponent(searchCategory);
+        const encodedCategory = encodeURIComponent(
+          searchCategory.toLowerCase()
+        );
 
-        const url = `search?q=${encodedSearchTerm}&category=${searchCategory}`;
+        const url = `search?q=${encodedSearchTerm}&category=${searchCategory}&page=1`;
         router.push(url);
 
+        setSearchTerm(_st);
       } else {
-        const url = `search?q=${encodedSearchTerm}`;
+        const url = `search?q=${encodedSearchTerm}&page=1`;
         router.push(url);
+
+        setSearchTerm(_st);
       }
-      setSearchTerm(_st);
     }
   };
 
@@ -200,7 +212,10 @@ export default function Header() {
                           <Link
                             href="#category"
                             className="text-sm"
-                            onClick={() => setSearchCategory("Misc")}
+                            onClick={() => {
+                              setSearchCategory("Misc");
+                              encodeURIAndPushToSearchPage();
+                            }}
                           >
                             Misc
                           </Link>

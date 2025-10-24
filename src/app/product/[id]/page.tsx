@@ -37,7 +37,9 @@ export default function ProductPage({
           </div>
         </div>
       ) : (
-        <div>loading</div>
+        <div className="flex flex-col items-center">
+          <div className="loader"></div>
+        </div>
       )}
     </>
   );

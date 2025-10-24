@@ -1,25 +1,39 @@
 "use client";
-import { Paper, Image, Text } from "@mantine/core";
+import { Paper, Image, Text, Pagination } from "@mantine/core";
 import axios from "axios";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { CardProps, Product } from "@/interfaces";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function Search() {
   const searchParams = useSearchParams();
   const query = searchParams.get("q");
   const category = searchParams.get("category");
+  // const p = searchParams.get("page");
+
+  const [page, setPage] = useState(Number(searchParams.get("page")));
+  const [totalResults, setTotalResults] = useState(0);
+  const [fetchedResults, setFetchedResults] = useState(false);
+
   const [searchResults, setSearchResults] = useState<Product[]>([]);
+  const router = useRouter();
 
   const fetchSearchResults = async () => {
     try {
+      setFetchedResults(false);
+      setSearchResults([]);
       const result = await axios.post("/api/search", {
         query: query,
         category: category,
+        page: page,
       });
-      console.log("DATA: ", result.data);
-      setSearchResults(result.data);
+      console.log("DATA: ", result.data.count);
+      setSearchResults(result.data.products);
+      setTotalResults(result.data.count);
+      setFetchedResults(true);
+      console.log("TOTAL RESULTS: ", totalResults);
     } catch (error) {
       console.error("Failed to fetch search results: ", error);
     }
@@ -28,6 +42,24 @@ export default function Search() {
   useEffect(() => {
     fetchSearchResults();
   }, [query]);
+
+  useEffect(() => {
+    if (query) {
+      const _st = query;
+      const encodedSearchTerm = encodeURIComponent(query);
+      if (category) {
+        const encodedCategory = encodeURIComponent(category);
+
+        const url = `search?q=${encodedSearchTerm}&category=${category}&page=${page}`;
+        router.push(url);
+        fetchSearchResults();
+      } else {
+        const url = `search?q=${encodedSearchTerm}&page=${page}`;
+        router.push(url);
+        fetchSearchResults();
+      }
+    }
+  }, [page]);
 
   function Card({ name, price, imageUrl, id }: CardProps) {
     return (
@@ -59,7 +91,7 @@ export default function Search() {
 
   return (
     <>
-      {searchResults.length > 0 ? (
+      {searchResults?.length > 0 ? (
         <div className="flex flex-col items-center">
           <div className="w-[70%] flex flex-wrap gap-10">
             {searchResults?.map((product) => {
@@ -67,13 +99,33 @@ export default function Search() {
                 name: product.name,
                 price: product.lowest_price,
                 imageUrl: product.path,
-                id: product.id
+                id: product.id,
               });
             })}
           </div>
+          <Pagination
+            className="mt-5 mb-3 "
+            color="#246d24"
+            value={Number(page)}
+            total={Math.ceil(totalResults / 12)}
+            onChange={setPage}
+          />
         </div>
       ) : (
-        <></>
+        <>
+          {
+            fetchedResults ? 
+            (<div>
+              <div className="flex flex-col items-center">
+              <span className="text-xl mt-10 font-bold">No Results</span>
+            </div>
+            </div>)
+            :
+            <div className="flex flex-col items-center">
+              <div className="loader"></div>
+            </div>
+          }
+        </>
       )}
     </>
   );
