@@ -28,6 +28,10 @@ export default function Header() {
     }
   }, [location]);
 
+  const pushToBrowseURL = (category: string) => {
+    router.push(`/search?q=&category=${category}&page=1`);
+  };
+
   const encodeURIAndPushToSearchPage = () => {
     const _st = searchTerm;
     const encodedSearchTerm = encodeURIComponent(searchTerm);
@@ -108,6 +112,7 @@ export default function Header() {
                 <Menu
                   width={110}
                   transitionProps={{ transition: "fade-down", duration: 150 }}
+                  closeOnItemClick={true}
                 >
                   <Menu.Target>
                     <Button className="browse-button mr-2 " radius="sm">
@@ -118,25 +123,17 @@ export default function Header() {
                     </Button>
                   </Menu.Target>
                   <Menu.Dropdown>
-                    <Menu.Item>
-                      <Link href="/search?q=&category=apparel&page=1" className="text-sm">
-                        Apparel
-                      </Link>
+                    <Menu.Item onClick={() => pushToBrowseURL("apparel")}>
+                      <span className="text-sm">Apparel</span>
                     </Menu.Item>
-                    <Menu.Item>
-                      <Link href="/search?q=&category=electronics&page=1" className="text-sm">
-                        Electronics
-                      </Link>
+                    <Menu.Item onClick={() => pushToBrowseURL("electronics")}>
+                      <span className="text-sm">Electronics</span>
                     </Menu.Item>
-                    <Menu.Item>
-                      <Link href="/search?q=&category=books&page=1" className="text-sm">
-                        Books
-                      </Link>
+                    <Menu.Item onClick={() => pushToBrowseURL("books")}>
+                      <span className="text-sm">Books</span>
                     </Menu.Item>
-                    <Menu.Item>
-                      <Link href="/search?q=&category=misc&page=1" className="text-sm">
-                        Misc
-                      </Link>
+                    <Menu.Item onClick={() => pushToBrowseURL("misc")}>
+                      <span className="text-sm">Misc</span>
                     </Menu.Item>
                   </Menu.Dropdown>
                 </Menu>

@@ -40,7 +40,7 @@ export default function Search() {
 
   useEffect(() => {
     fetchSearchResults();
-  }, [query]);
+  }, [query, category]);
 
   useEffect(() => {
 
