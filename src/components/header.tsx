@@ -22,7 +22,6 @@ export default function Header() {
   const router = useRouter();
 
   useEffect(() => {
-    console.log(location);
     if (location !== "/search" && !location.match(/product/)) {
       setSearchTerm("");
       setSearchCategory("Category");
@@ -30,24 +29,20 @@ export default function Header() {
   }, [location]);
 
   const encodeURIAndPushToSearchPage = () => {
-    if (searchTerm.trim() !== "") {
-      const _st = searchTerm;
-      const encodedSearchTerm = encodeURIComponent(searchTerm);
-      if (searchCategory !== "Category") {
-        const encodedCategory = encodeURIComponent(
-          searchCategory.toLowerCase()
-        );
+    const _st = searchTerm;
+    const encodedSearchTerm = encodeURIComponent(searchTerm);
+    if (searchCategory !== "Category") {
+      const encodedCategory = encodeURIComponent(searchCategory.toLowerCase());
 
-        const url = `search?q=${encodedSearchTerm}&category=${searchCategory}&page=1`;
-        router.push(url);
+      const url = `search?q=${encodedSearchTerm}&category=${encodedCategory}&page=1`;
+      router.push(url);
 
-        setSearchTerm(_st);
-      } else {
-        const url = `search?q=${encodedSearchTerm}&page=1`;
-        router.push(url);
+      setSearchTerm(_st);
+    } else {
+      const url = `search?q=${encodedSearchTerm}&page=1`;
+      router.push(url);
 
-        setSearchTerm(_st);
-      }
+      setSearchTerm(_st);
     }
   };
 
@@ -181,44 +176,23 @@ export default function Header() {
                         </span>
                       </Menu.Target>
                       <Menu.Dropdown>
-                        <Menu.Item>
-                          <Link
-                            href="#category"
-                            className="text-sm"
-                            onClick={() => setSearchCategory("Apparel")}
-                          >
-                            Apparel
-                          </Link>
+                        <Menu.Item onClick={() => setSearchCategory("Apparel")}>
+                          <span className="text-sm">Apparel</span>
                         </Menu.Item>
-                        <Menu.Item>
-                          <Link
-                            href="#category"
-                            className="text-sm"
-                            onClick={() => setSearchCategory("Electronics")}
-                          >
-                            Electronics
-                          </Link>
+                        <Menu.Item
+                          onClick={() => setSearchCategory("Electronics")}
+                        >
+                          <span className="text-sm">Electronics</span>
                         </Menu.Item>
-                        <Menu.Item>
-                          <Link
-                            href="#category"
-                            className="text-sm"
-                            onClick={() => setSearchCategory("Books")}
-                          >
-                            Books
-                          </Link>
+                        <Menu.Item onClick={() => setSearchCategory("Books")}>
+                          <span className="text-sm">Books</span>
                         </Menu.Item>
-                        <Menu.Item>
-                          <Link
-                            href="#category"
-                            className="text-sm"
-                            onClick={() => {
-                              setSearchCategory("Misc");
-                              encodeURIAndPushToSearchPage();
-                            }}
-                          >
-                            Misc
-                          </Link>
+                        <Menu.Item
+                          onClick={() => {
+                            setSearchCategory("Misc");
+                          }}
+                        >
+                          <span className="text-sm">Misc</span>
                         </Menu.Item>
                       </Menu.Dropdown>
                     </Menu>

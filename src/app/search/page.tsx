@@ -11,7 +11,6 @@ export default function Search() {
   const searchParams = useSearchParams();
   const query = searchParams.get("q");
   const category = searchParams.get("category");
-  // const p = searchParams.get("page");
 
   const [page, setPage] = useState(Number(searchParams.get("page")));
   const [totalResults, setTotalResults] = useState(0);
@@ -24,16 +23,16 @@ export default function Search() {
     try {
       setFetchedResults(false);
       setSearchResults([]);
+      console.log("Category: ", category);
       const result = await axios.post("/api/search", {
         query: query,
         category: category,
         page: page,
       });
-      console.log("DATA: ", result.data.count);
+      console.log("RESULTS:", result.data.products);
       setSearchResults(result.data.products);
       setTotalResults(result.data.count);
       setFetchedResults(true);
-      console.log("TOTAL RESULTS: ", totalResults);
     } catch (error) {
       console.error("Failed to fetch search results: ", error);
     }
@@ -44,9 +43,9 @@ export default function Search() {
   }, [query]);
 
   useEffect(() => {
-    if (query) {
+
       const _st = query;
-      const encodedSearchTerm = encodeURIComponent(query);
+      const encodedSearchTerm = encodeURIComponent(query ? query : "");
       if (category) {
         const encodedCategory = encodeURIComponent(category);
 
@@ -58,7 +57,7 @@ export default function Search() {
         router.push(url);
         fetchSearchResults();
       }
-    }
+    
   }, [page]);
 
   function Card({ name, price, imageUrl, id }: CardProps) {
