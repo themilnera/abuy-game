@@ -7,13 +7,9 @@ export default function Cart(){
 
   return (
     <>
-      <Modal opened={opened} onClose={close} title="Authentication">
-        {/* Modal content */}
-      </Modal>
 
-      <Group>
-        <Button onClick={open}>Open modal</Button>
-      </Group>
+
+      <div></div>
     </>
   );
 }

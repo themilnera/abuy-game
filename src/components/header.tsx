@@ -140,7 +140,7 @@ export default function Header() {
               </div>
               <div className="flex md:w-[100%] items-center ml-20 md:ml-0">
                 <TextInput
-                  placeholder="Search for something"
+                  placeholder="Search"
                   aria-label="Search field"
                   size="md"
                   radius={"lg"}

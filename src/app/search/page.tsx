@@ -82,7 +82,7 @@ export default function Search() {
         </div>
         <div className="mt-auto p-2 self-start ">
           <Text className="hover:underline!">{name}</Text>
-          <Text w={700}>${price}</Text>
+          <Text className="font-bold!" w={700}>${price}</Text>
         </div>
       </Paper>
     );
