@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "@mantine/core/styles.css";
-import '@mantine/carousel/styles.css';
+import "@mantine/carousel/styles.css";
 import {
   ColorSchemeScript,
   MantineProvider,
@@ -9,6 +9,7 @@ import {
 } from "@mantine/core";
 import "./globals.css";
 import Header from "@/components/header";
+import { ClerkProvider } from "@clerk/nextjs";
 
 export const metadata: Metadata = {
   title: "ABUY.com",
@@ -22,18 +23,19 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   return (
-    <html lang="en" {...mantineHtmlProps}>
-      <head>
-        <ColorSchemeScript />
-      </head>
-      <body className={`${inter.className} antialiased flex flex-col`}>
-        <MantineProvider>
-          <Header/>
-          {children}
-        </MantineProvider>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en" {...mantineHtmlProps}>
+        <head>
+          <ColorSchemeScript />
+        </head>
+        <body className={`${inter.className} antialiased flex flex-col`}>
+          <MantineProvider>
+            <Header />
+            {children}
+          </MantineProvider>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

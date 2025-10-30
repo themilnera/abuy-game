@@ -58,11 +58,11 @@ export default function Header() {
             {/* Top of header (links) */}
             <div className="header-top w-[100%] h-9 pl-3 pt-1 pb-1 bg-white flex flex-row gap-10 border-b border-b-stone-400">
               <div className="flex gap-1.5">
-                <Link href="/" className="text-blue-800 underline ml-1">
+                <Link href="/account" className="text-blue-800 underline ml-1">
                   Sign In
                 </Link>
                 <p>or</p>
-                <Link href="/" className="text-blue-800 underline">
+                <Link href="/account" className="text-blue-800 underline">
                   Register
                 </Link>
               </div>

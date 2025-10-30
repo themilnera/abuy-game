@@ -4,10 +4,6 @@ import { useState } from "react";
 import Sentiment from 'sentiment';
 import sentiment from 'wink-sentiment';
 
-interface results {
-    sentimentScore: number;
-    winkScore: number;
-}
 
 export default function TestDescription(){
     //SENTIMENT
@@ -15,28 +11,12 @@ export default function TestDescription(){
 
 
     const [descriptionText, setDescriptionText] = useState("");
-    const [allResults, setAllResults] = useState<results | null>();
+    const [allResults, setAllResults] = useState();
 
     const analyzeText = ()=>{
-        if(descriptionText != ""){
-            //SENTIMENT
-            const options = {
-                extras: {
-                    'fuck': 0,
-                }
-            }
-            const res = sent.analyze(descriptionText, options);
-            const sentimentScore = res.score.toString();
-
-            //WINK
-            const winkScore = sentiment(descriptionText);
-            console.log(winkScore);
-            setAllResults({
-                sentimentScore: Number(sentimentScore),
-                winkScore: Number(winkScore.score)
-            })
-        } 
-        else setAllResults(null);
+        if(descriptionText.trim() !== ""){
+            
+        }
     }
 
     return(<>
@@ -48,8 +28,8 @@ export default function TestDescription(){
             <Button onClick={analyzeText} className="mt-3">Analyze</Button>
             { allResults ? (
                 <>
-                    <div>Sentiment: {allResults.sentimentScore}</div>
-                    <div>Wink: {allResults.winkScore}</div>
+                    <div>:</div>
+                    <div></div>
                 </>
             ) : (
                 <></>
