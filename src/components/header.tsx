@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Menu, NavLink, TextInput, Tooltip } from "@mantine/core";
+import { Button, Menu, NavLink, TextInput, Tooltip, UnstyledButton } from "@mantine/core";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -12,12 +12,26 @@ import {
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { SignedIn, useAuth, useUser } from "@clerk/nextjs";
 
 export default function Header() {
-  const hiddenHeaderRoutes = ["/admin/create-product"];
+  const { isLoaded, isSignedIn, user } = useUser();
+  const hiddenHeaderRoutes = [
+    "/admin/create-product",
+    "/account",
+    "/account/sign-in",
+  ];
+  const categories = [
+    "Apparel",
+    "Electronics",
+    "Books",
+    "Home & Garden",
+    "Misc",
+  ];
   const [searchBarInFocus, setSearchBarInFocus] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchCategory, setSearchCategory] = useState("Category");
+  const [sbcMw, setSbcMw] = useState(100);
   const location = usePathname();
   const router = useRouter();
 
@@ -29,14 +43,20 @@ export default function Header() {
   }, [location]);
 
   const pushToBrowseURL = (category: string) => {
-    router.push(`/search?q=&category=${category}&page=1`);
+    router.push(
+      `/search?q=&category=${encodeURIComponent(
+        category.replace(" & ", "").trim()
+      )}&page=1`
+    );
   };
 
   const encodeURIAndPushToSearchPage = () => {
     const _st = searchTerm;
     const encodedSearchTerm = encodeURIComponent(searchTerm);
     if (searchCategory !== "Category") {
-      const encodedCategory = encodeURIComponent(searchCategory.toLowerCase());
+      const encodedCategory = encodeURIComponent(
+        searchCategory.replace(" & ", "").toLowerCase()
+      );
 
       const url = `search?q=${encodedSearchTerm}&category=${encodedCategory}&page=1`;
       router.push(url);
@@ -57,16 +77,32 @@ export default function Header() {
           <div className="header md:w-[70vw] h-60 text-sm flex flex-col">
             {/* Top of header (links) */}
             <div className="header-top w-[100%] h-9 pl-3 pt-1 pb-1 bg-white flex flex-row gap-10 border-b border-b-stone-400">
-              <div className="flex gap-1.5">
-                <Link href="/account" className="text-blue-800 underline ml-1">
-                  Sign In
-                </Link>
-                <p>or</p>
-                <Link href="/account" className="text-blue-800 underline">
-                  Register
-                </Link>
-              </div>
-
+              {!SignedIn ? (
+                <div className="flex gap-1.5">
+                  <Link
+                    href="/account/sign-in"
+                    className="text-blue-800 underline ml-1"
+                  >
+                    Sign In
+                  </Link>
+                  <p>or</p>
+                  <Link
+                    href="/account/sign-in"
+                    className="text-blue-800 underline"
+                  >
+                    Register
+                  </Link>
+                </div>
+              ) : (
+                <div className="flex gap-1.5">
+                  <Link
+                    href={"/account"}
+                    className="text-blue-800 underline ml-1"
+                  >
+                    Welcome, {user?.firstName}
+                  </Link>
+                </div>
+              )}
               <div className="flex gap-10 collapse md:visible">
                 <Link
                   href="/deals"
@@ -110,7 +146,7 @@ export default function Header() {
                   ></Image>
                 </Link>
                 <Menu
-                  width={110}
+                  width={140}
                   transitionProps={{ transition: "fade-down", duration: 150 }}
                   closeOnItemClick={true}
                 >
@@ -123,18 +159,18 @@ export default function Header() {
                     </Button>
                   </Menu.Target>
                   <Menu.Dropdown>
-                    <Menu.Item onClick={() => pushToBrowseURL("apparel")}>
-                      <span className="text-sm">Apparel</span>
-                    </Menu.Item>
-                    <Menu.Item onClick={() => pushToBrowseURL("electronics")}>
-                      <span className="text-sm">Electronics</span>
-                    </Menu.Item>
-                    <Menu.Item onClick={() => pushToBrowseURL("books")}>
-                      <span className="text-sm">Books</span>
-                    </Menu.Item>
-                    <Menu.Item onClick={() => pushToBrowseURL("misc")}>
-                      <span className="text-sm">Misc</span>
-                    </Menu.Item>
+                    {categories.map((category) => {
+                      return (
+                        <Menu.Item
+                          key={category}
+                          onClick={() => {
+                            pushToBrowseURL(category.toLowerCase());
+                          }}
+                        >
+                          <span className="text-sm">{category}</span>
+                        </Menu.Item>
+                      );
+                    })}
                   </Menu.Dropdown>
                 </Menu>
               </div>
@@ -168,29 +204,26 @@ export default function Header() {
                       }}
                     >
                       <Menu.Target>
-                        <span className="w-[200px] text-sm! mr-13 border-l-1 p-2 text-gray-400 hover:cursor-pointer">
+                        <UnstyledButton maw={180} miw={sbcMw} className="flex text-sm! border-l-1 pl-2 mr-8 text-gray-400 hover:cursor-pointer">
                           {searchCategory}
-                        </span>
+                        </UnstyledButton>
                       </Menu.Target>
                       <Menu.Dropdown>
-                        <Menu.Item onClick={() => setSearchCategory("Apparel")}>
-                          <span className="text-sm">Apparel</span>
-                        </Menu.Item>
-                        <Menu.Item
-                          onClick={() => setSearchCategory("Electronics")}
-                        >
-                          <span className="text-sm">Electronics</span>
-                        </Menu.Item>
-                        <Menu.Item onClick={() => setSearchCategory("Books")}>
-                          <span className="text-sm">Books</span>
-                        </Menu.Item>
-                        <Menu.Item
-                          onClick={() => {
-                            setSearchCategory("Misc");
-                          }}
-                        >
-                          <span className="text-sm">Misc</span>
-                        </Menu.Item>
+                        {categories.map((category) => {
+                          return (
+                            <Menu.Item
+                              key={category}
+                              onClick={() => {
+                                setSearchCategory(category);
+                                category.length > 11 ?
+                                  setSbcMw(180) : setSbcMw(category.length * 10);
+                              }}
+                              onLoad={()=>{setSbcMw(category.length * 10)}}
+                            >
+                              <span className="text-sm">{category}</span>
+                            </Menu.Item>
+                          );
+                        })}
                       </Menu.Dropdown>
                     </Menu>
                   }
