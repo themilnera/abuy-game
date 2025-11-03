@@ -12,7 +12,7 @@ export interface Product {
 export interface CardProps {
   name: string;
   price: number;
-  imageUrl: string;
+  path: string;
   id: string;
 }
 
