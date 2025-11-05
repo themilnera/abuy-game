@@ -53,7 +53,7 @@ export default function TestDescription() {
             if (result?.data?.[0]?.types) {
               return result.data[0].types;
             }
-            return null;
+            return "neutral";
           } catch (error) {
             console.error("Error checking token for word: ", error);
           }
@@ -64,9 +64,8 @@ export default function TestDescription() {
       } catch (error) {
         console.error("Failed to check types: ", error);
       }
-    }
-    else{
-        setAnalyzeButtonEnabled(true);
+    } else {
+      setAnalyzeButtonEnabled(true);
     }
   };
   const scoreResults = async () => {
@@ -120,20 +119,32 @@ export default function TestDescription() {
 
   return (
     <>
-      <div className="flex flex-col items-center">
+      <div className="flex flex-col items-center mt-50">
+        <span className="mb-5 font-semibold text-xl">Description Analyzer</span>
+
         <span className="flex flex-col items-center h-[400px] w-[70%]">
           <Textarea
             placeholder="Enter some text"
-            w={600}
+            w={400}
+            rows={5}
             size="md"
+            radius={"md"}
             value={descriptionText}
             onChange={(e) => {
               setDescriptionText(e.target.value);
             }}
           ></Textarea>
-          {analyzeButtonEnabled ? (<Button onClick={analyzeText} size="md" className="mt-5 bg-amber-800!">
-            Analyze
-          </Button>) : <div className="loader"></div>}
+          {analyzeButtonEnabled ? (
+            <Button
+              onClick={analyzeText}
+              size="md"
+              className="mt-5 mb-5 bg-amber-800!"
+            >
+              Analyze
+            </Button>
+          ) : (
+            <div className="loader"></div>
+          )}
           {finishedScoring ? (
             <div className="flex flex-wrap justify-center w-130 gap-3 mt-5">
               {score.brash > 0 ? (
@@ -188,11 +199,19 @@ export default function TestDescription() {
                 <></>
               )}
               {/* Neutral */}
-              {score.brash === 0 && score.warm === 0 && score.smooth === 0 && score.cringe === 0 && score.grandiose === 0 && score.casual === 0 && score.insane === 0 && score.literate === 0 && score.professional === 0 ? 
-              <div className="bg-teal-400 p-5">
-                  NEUTRAL
-                </div>
-              : <></>}
+              {score.brash === 0 &&
+              score.warm === 0 &&
+              score.smooth === 0 &&
+              score.cringe === 0 &&
+              score.grandiose === 0 &&
+              score.casual === 0 &&
+              score.insane === 0 &&
+              score.literate === 0 &&
+              score.professional === 0 ? (
+                <div className="bg-teal-400 p-5">NEUTRAL</div>
+              ) : (
+                <></>
+              )}
             </div>
           ) : (
             <></>

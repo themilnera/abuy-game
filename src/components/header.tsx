@@ -1,6 +1,13 @@
 "use client";
 
-import { Button, Menu, NavLink, TextInput, Tooltip, UnstyledButton } from "@mantine/core";
+import {
+  Button,
+  Menu,
+  NavLink,
+  TextInput,
+  Tooltip,
+  UnstyledButton,
+} from "@mantine/core";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -16,11 +23,14 @@ import { SignedIn, useAuth, useUser } from "@clerk/nextjs";
 
 export default function Header() {
   const { isLoaded, isSignedIn, user } = useUser();
-  const hiddenHeaderRoutes = [
-    "/admin/create-product",
-    "/account",
-    "/account/sign-in",
-  ];
+  const location = usePathname();
+  const router = useRouter();
+
+  const hiddenHeaderRoutes = ["/admin", "/account"];
+  const isHeaderHiddenRoute = hiddenHeaderRoutes.some((route) =>
+    location.match(route)
+  );
+
   const categories = [
     "Apparel",
     "Electronics",
@@ -28,12 +38,11 @@ export default function Header() {
     "Home & Garden",
     "Misc",
   ];
+
   const [searchBarInFocus, setSearchBarInFocus] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchCategory, setSearchCategory] = useState("Category");
-  const [sbcMw, setSbcMw] = useState(100);
-  const location = usePathname();
-  const router = useRouter();
+  const [sbcMw, setSbcMw] = useState(100); //search bar category minimum width
 
   useEffect(() => {
     if (location !== "/search" && !location.match(/product/)) {
@@ -72,7 +81,7 @@ export default function Header() {
 
   return (
     <>
-      {!hiddenHeaderRoutes.includes(location) ? (
+      {!isHeaderHiddenRoute ? (
         <div className="flex flex-col items-center">
           <div className="header md:w-[70vw] h-60 text-sm flex flex-col">
             {/* Top of header (links) */}
@@ -204,7 +213,11 @@ export default function Header() {
                       }}
                     >
                       <Menu.Target>
-                        <UnstyledButton maw={180} miw={sbcMw} className="flex text-sm! border-l-1 pl-2 mr-8 text-gray-400 hover:cursor-pointer">
+                        <UnstyledButton
+                          maw={180}
+                          miw={sbcMw}
+                          className="flex text-sm! border-l-1 pl-2 mr-8 text-gray-400 hover:cursor-pointer"
+                        >
                           {searchCategory}
                         </UnstyledButton>
                       </Menu.Target>
@@ -215,10 +228,13 @@ export default function Header() {
                               key={category}
                               onClick={() => {
                                 setSearchCategory(category);
-                                category.length > 11 ?
-                                  setSbcMw(180) : setSbcMw(category.length * 10);
+                                category.length > 11
+                                  ? setSbcMw(180)
+                                  : setSbcMw(category.length * 10);
                               }}
-                              onLoad={()=>{setSbcMw(category.length * 10)}}
+                              onLoad={() => {
+                                setSbcMw(category.length * 10);
+                              }}
                             >
                               <span className="text-sm">{category}</span>
                             </Menu.Item>
