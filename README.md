@@ -13,7 +13,7 @@ This project uses:
 - PostgreSQL
 - Mantine component library
 - Tabler icons
-
+- Stock images from places like Pexels, Unsplash, Pixabay, Shopify
 ## Goals
 
 - A detailed shopping site simulation that allows you to buy virtual items with virtual money, and resell them on a virtual market.

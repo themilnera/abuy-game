@@ -27,7 +27,7 @@ export default function ProductPage({
   }, []);
 
   return (
-    <>
+    <div className="min-h-170">
       {product ? (
         <div className="flex flex-col items-center">
           <div className="w-[70%] flex md:flex-row flex-col gap-5">
@@ -46,6 +46,6 @@ export default function ProductPage({
           <div className="loader"></div>
         </div>
       )}
-    </>
+    </div>
   );
 }
