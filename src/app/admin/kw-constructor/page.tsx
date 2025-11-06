@@ -1,6 +1,6 @@
 "use client";
 import { TextInput, Checkbox, Stack, Button, Textarea } from "@mantine/core";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 //make a db table with the tokens, leave the type field blank
 export default function KeywordConstructor() {
@@ -73,7 +73,10 @@ export default function KeywordConstructor() {
             Load
           </Button>
         </span>
-        <span><span className="font-bold tracking-wide text-lg underline">ID:</span> {line.toString()}</span>
+        <span>
+          <span className="font-bold tracking-wide text-lg underline">ID:</span>{" "}
+          {line.toString()}
+        </span>
         <TextInput
           className="flex! tracking-wide! flex-col text-center mt-2"
           radius={"md"}
@@ -153,11 +156,12 @@ export default function KeywordConstructor() {
           label="Types List"
           value={!selectedTypes ? "" : selectedTypes.join(" ")}
           labelProps={{
-            className: "mb-2 font-semibold! tracking-wide!"
+            className: "mb-2 font-semibold! tracking-wide!",
           }}
           onChange={(e) => {
             setSelectedTypes(e.target.value.split(" ").filter((t) => t.trim()));
           }}
+          autoFocus
           radius={"md"}
         ></Textarea>
         <div className="flex gap-3">

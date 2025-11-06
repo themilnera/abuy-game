@@ -13,7 +13,6 @@ export async function POST(request: NextRequest){
         const result = await pool.query(`
             SELECT * FROM token_types 
             WHERE token ILIKE $1 
-            AND types != 'neutral'
             ORDER BY LENGTH(token) ASC 
             LIMIT 1`,[`${token}%`]);
         if(result.rows.length != 0){

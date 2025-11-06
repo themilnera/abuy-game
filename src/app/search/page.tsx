@@ -64,9 +64,9 @@ export default function Search() {
 
 
   return (
-    <>
+    <div className="h-[120vh]">
       {searchResults?.length > 0 ? (
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center h-[100%]">
           <div className="w-[70%] flex flex-wrap gap-10">
             {searchResults?.map((product) => {
               return Card({
@@ -78,7 +78,7 @@ export default function Search() {
             })}
           </div>
           <Pagination
-            className="mt-5 mb-3 "
+            className="mb-3 mt-auto!"
             color="#246d24"
             value={Number(page)}
             total={Math.ceil(totalResults / 12)}
@@ -101,6 +101,6 @@ export default function Search() {
           }
         </>
       )}
-    </>
+    </div>
   );
 }

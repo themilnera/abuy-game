@@ -143,7 +143,7 @@ export default function TestDescription() {
               Analyze
             </Button>
           ) : (
-            <div className="loader"></div>
+            <div className="loader mt-5"></div>
           )}
           {finishedScoring ? (
             <div className="flex flex-wrap justify-center w-130 gap-3 mt-5">

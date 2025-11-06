@@ -10,6 +10,7 @@ import {
 import "./globals.css";
 import Header from "@/components/header";
 import { ClerkProvider } from "@clerk/nextjs";
+import Footer from "@/components/footer";
 
 export const metadata: Metadata = {
   title: "ABUY.com",
@@ -29,10 +30,11 @@ export default function RootLayout({
         <head>
           <ColorSchemeScript />
         </head>
-        <body className={`${inter.className} antialiased flex flex-col`}>
+        <body className={`${inter.className} antialiased flex flex-col overflow-x-hidden`}>
           <MantineProvider>
-            <Header />
-            {children}
+              <Header />
+              {children}
+              <Footer />
           </MantineProvider>
         </body>
       </html>
