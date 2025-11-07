@@ -34,6 +34,7 @@ export default function Search() {
       setSearchResults(result.data.products);
       setTotalResults(result.data.count);
       setFetchedResults(true);
+      
     } catch (error) {
       console.error("Failed to fetch search results: ", error);
     }
@@ -41,6 +42,8 @@ export default function Search() {
 
   useEffect(() => {
     fetchSearchResults();
+    const pg = searchParams.get("page");
+      setPage(Number(pg));
   }, [query, category]);
 
   useEffect(() => {
@@ -58,6 +61,7 @@ export default function Search() {
         router.push(url);
         fetchSearchResults();
       }
+      
     
   }, [page]);
 

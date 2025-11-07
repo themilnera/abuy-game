@@ -8,6 +8,12 @@ import { useRouter } from "next/navigation";
 
 export default function SpecialOffer() {
   const router = useRouter();
+  const bgColorOptions = ["#0a380a","#0a2838","#380a0a","#380a1d","#381c0a"];
+  const textColorOptions = ["#8ecc77","#77ccc8","#cc7777","#cc77b4","#cc9577"];
+  const colorChoice = Math.floor(Math.random()*textColorOptions.length);
+  const [textColor, setTextColor] = useState(textColorOptions[colorChoice]);
+  const [bgColor, setBgColor] = useState(bgColorOptions[colorChoice]);
+
   const [loaded, setLoaded] = useState(false);
   const [product, setProduct] = useState<Product | null>();
   const blurbPhrases = ["Try this amazing #, you'll love it.*%", "Check out this #!", "You need this # in your life, immediately.*%", "Don't pass up the chance to get this #!"];
@@ -27,6 +33,7 @@ export default function SpecialOffer() {
       }
       setProduct(result.data.rows[0]);
       setBlurb(chosenBlurb);
+      
       
     } catch (error) {
       console.error("Failed to fetch random product: ", error);
@@ -54,29 +61,35 @@ export default function SpecialOffer() {
   }
   else if(product && blurb) return (
     <>
-      <div className="feat-daily-deal w-[70vw] h-[30vh] bg-green-950 rounded-3xl flex items-center justify-end p-5 lg:pl-30 lg:pr-40">
+      <div style={{background: bgColor}} className="feat-daily-deal w-[70vw] h-[30vh] rounded-3xl flex items-center justify-end p-5 lg:pl-30 lg:pr-40">
         <div className="self-start mr-auto break-words w-100 h-[100%] flex flex-col">
-          <Text className="text-2xl! md:text-4xl!" c={"#8ecc77"} fw={900}>
+          <Text className="text-2xl! md:text-4xl!" c={textColor} fw={900}>
             Special Offer
           </Text>
 
-          <p className="text-1xl! mt-5! text-[#8ecc77] font-extrabold">
-            {blurb.replace("#", product.name).replace("%", "")}
-          </p>
+          <Text c={textColor} className="text-1xl! mt-5! font-extrabold">
+            { product.category !== "books" ?
+              (blurb.replace("#", product.name).replace("%", ""))
+              :
+              (blurb.replace("#", " book: "+product.name).replace("%", ""))
+            }
+          </Text>
           <Button
             radius="lg"
-            w={105}
-            className="mt-5 text-green-950! bg-[#8ecc77]!"
+            c={bgColor}
+            bg={textColor}
+            w={150}
+            className="mt-10"
             onClick={()=>{
               router.push(`/product/${product.id}`)
             }}
           >
             See Offer
           </Button>
-          <p className="text-sm text-[#8ecc77] mt-auto">
+          <Text c={textColor} className="text-sm mt-auto!">
             {blurbAddendum}
             
-          </p>
+          </Text>
         </div>
         <Image
           className="ml-auto w-60! invisible md:visible"

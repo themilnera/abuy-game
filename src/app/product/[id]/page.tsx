@@ -31,7 +31,7 @@ export default function ProductPage({
       {product ? (
         <div className="flex flex-col items-center">
           <div className="w-[70%] flex md:flex-row flex-col gap-5">
-            <Image radius={'lg'} className="flex-10" src={`/images/${product.path}`}></Image>
+            <Image radius={'lg'} mah={700} className="flex-10" src={`/images/${product.path}`}></Image>
             <div className="md:ml-3 flex-7 flex flex-col gap-3">
               <span className="font-bold text-2xl">{product.name}</span>
               <span className="font-bold text-xl border-gray-400 border-t-1 pt-4">${product.lowest_price}</span>
