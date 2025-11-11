@@ -9,14 +9,14 @@ export async function POST(
   request: NextRequest
 ){
     const body = await request.json();
-    const { user_id, seller_name, seller_image_url, current_day } = body;
+    const { user_id, seller_name, seller_image_url, current_day, money } = body;
     const current_day_seed = generateSeed();
     try {
         const result = await pool.query(`
-            INSERT INTO users (user_id, seller_name, seller_image_url, current_day, current_day_seed)
-            VALUES ($1, $2, $3, $4, $5)
+            INSERT INTO users (user_id, seller_name, seller_image_url, current_day, current_day_seed, money)
+            VALUES ($1, $2, $3, $4, $5, $6)
             RETURNING *`, 
-            [user_id, seller_name, seller_image_url, current_day, current_day_seed]);
+            [user_id, seller_name, seller_image_url, current_day, current_day_seed, money]);
         console.log("Inserted: ", result.rows);
         return NextResponse.json(result);
     } catch (error) {

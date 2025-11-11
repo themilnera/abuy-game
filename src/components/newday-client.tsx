@@ -50,7 +50,7 @@ export default function NewDayClient({
   const addNewUserToDbAndStart = async ()=>{
     try {
       setDbError(false);
-      const result = await axios.post("/api/user/", { user_id: user?.id, seller_name: sellerName, seller_image_url: profileImage, current_day: 1 });
+      const result = await axios.post("/api/user/", { user_id: user?.id, seller_name: sellerName, seller_image_url: profileImage, current_day: 1, money: 100 });
       if(result.data){
         console.log("Success: ", result.data);
         router.push("/");
@@ -68,24 +68,25 @@ export default function NewDayClient({
   }
   return (
     <>
-      <Modal
-        size={"lg"}
-        opened={opened}
-        onClose={() => {
-          close();
-        }}
-        withCloseButton={true}
-        centered
-      >
-        <div className="flex flex-wrap gap-5 items-center justify-center mb-10">
-          {availableImages.map(name => (
-            <Image className="hover:cursor-pointer" onClick={()=>{
-              setProfileImage(`/images/profile-pics/${name}`)
-              close();
-            }} radius={'lg'} key={name} w={150} h={150} src={`/images/profile-pics/${name}`}/>
-          ))}
-        </div>
-      </Modal>
+    <Modal
+      size={"lg"}
+      opened={opened}
+      onClose={() => {
+        close();
+      }}
+      withCloseButton={true}
+      centered
+    >
+      <div className="flex flex-wrap gap-5 items-center justify-center mb-10">
+        {availableImages.map(name => (
+          <Image className="hover:cursor-pointer" onClick={()=>{
+            setProfileImage(`/images/profile-pics/${name}`)
+            close();
+          }} radius={'lg'} key={name} w={150} h={150} src={`/images/profile-pics/${name}`}/>
+        ))}
+      </div>
+    </Modal>
+    
       {newUser ? (
         <div className="flex flex-col items-center justify-center">
           <div className="w-[75%] min-h-200 border-2 tracking-tight border-blue-900 rounded-2xl mt-10 flex flex-col items-center  bg-[#c9e3e5]">

@@ -25,7 +25,8 @@ export default function Header() {
   const { isLoaded, isSignedIn, user } = useUser();
   const location = usePathname();
   const router = useRouter();
-
+  const [sellerName, setSellerName] = useState<string | null>();
+  const [currentCash, setCurrentCash] = useState<string | null>();
   const hiddenHeaderRoutes = ["/admin", "/account", "new-day"];
   const isHeaderHiddenRoute = hiddenHeaderRoutes.some((route) =>
     location.match(route)
@@ -59,6 +60,10 @@ export default function Header() {
           if(result.data.rows.length < 1){
             console.log("No user db object");
             router.push("/new-day")
+          }
+          else{
+            setSellerName(result.data.rows[0].seller_name);
+            setCurrentCash('$'+result.data.rows[0].money.toString());
           }
         }
       } catch (error) {
@@ -103,8 +108,8 @@ export default function Header() {
           <div className="header md:w-[70vw] h-60 text-sm flex flex-col">
 
 {/* Top of header (links) */}
-            <div className="header-top w-[100%] h-9 pl-3 pt-1 pb-1 bg-white flex flex-row gap-10 border-b border-b-stone-400">
-              {!isSignedIn 
+            <div className="header-top w-[100%] h-12 pl-3 bg-white flex flex-row items-center justify-center gap-10 border-b border-b-stone-400">
+              {!isSignedIn || !sellerName
                ? (
                 <div className="flex gap-1.5">
                   <Link
@@ -122,28 +127,18 @@ export default function Header() {
                   </Link>
                 </div>
               ) : (
-                <div className="flex gap-1.5">
+                <div className="flex gap-6 items-center">
                   <Link
                     href={"/account"}
                     className="text-blue-800 underline ml-1"
                   >
-                    Welcome, {user?.username}
+                    Welcome, {sellerName}
                   </Link>
+                  <span className="font-bold text-lg">{currentCash}</span>
                 </div>
               )}
-              <div className="flex gap-10 collapse md:visible">
-                <Link
-                  href="/deals"
-                  className="hover:underline hover:underline-offset-3"
-                >
-                  Deals of the Day
-                </Link>
-                <Link
-                  href="/help"
-                  className="hover:underline hover:underline-offset-3"
-                >
-                  Need Help?
-                </Link>
+              <div className="flex gap-10 ">
+                <Button size="xs" color="#7a2020" onClick={()=>{router.push("/new-day")}}>End Game Day</Button>
               </div>
 
               <div className="flex gap-5 ml-auto mr-5">
