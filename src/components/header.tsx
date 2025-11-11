@@ -1,5 +1,4 @@
 "use client";
-
 import {
   Button,
   Menu,
@@ -26,7 +25,7 @@ export default function Header() {
   const location = usePathname();
   const router = useRouter();
 
-  const hiddenHeaderRoutes = ["/admin", "/account"];
+  const hiddenHeaderRoutes = ["/admin", "/account", "new-day"];
   const isHeaderHiddenRoute = hiddenHeaderRoutes.some((route) =>
     location.match(route)
   );
@@ -84,9 +83,11 @@ export default function Header() {
       {!isHeaderHiddenRoute ? (
         <div className="flex flex-col items-center">
           <div className="header md:w-[70vw] h-60 text-sm flex flex-col">
-            {/* Top of header (links) */}
+
+{/* Top of header (links) */}
             <div className="header-top w-[100%] h-9 pl-3 pt-1 pb-1 bg-white flex flex-row gap-10 border-b border-b-stone-400">
-              {!SignedIn ? (
+              {!SignedIn || !user?.firstName || !user.primaryEmailAddress 
+               ? (
                 <div className="flex gap-1.5">
                   <Link
                     href="/account/sign-in"
@@ -108,7 +109,7 @@ export default function Header() {
                     href={"/account"}
                     className="text-blue-800 underline ml-1"
                   >
-                    Welcome, {user?.firstName}
+                    Welcome, {user?.username}
                   </Link>
                 </div>
               )}
@@ -143,7 +144,7 @@ export default function Header() {
               </div>
             </div>
 
-            {/* Bottom of header */}
+{/* Bottom of header */}
             <div className="header-bottom w-[100%] h-[100%] flex flex-col md:flex-row items-center">
               <div className="flex items-center">
                 <Link href="/">

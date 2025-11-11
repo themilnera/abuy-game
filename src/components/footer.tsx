@@ -3,7 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 export default function Footer() {
-  const footerHiddenRoutes = ["/admin", "/account"];
+  const footerHiddenRoutes = ["/admin", "/account", "new-day"];
   const location = usePathname();
   const isFooterHiddenRoute = footerHiddenRoutes.some((route) =>
     location.match(route)
