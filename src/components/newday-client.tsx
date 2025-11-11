@@ -17,6 +17,9 @@ export default function NewDayClient({
   const router = useRouter();
   const [newUser, setNewUser] = useState(false);
   const [sellerName, setSellerName] = useState<string>("");
+  const [conditionsMet, setCondidionsMet] = useState(false);
+  const [dbError, setDbError] = useState(false);
+  const [attemptingCreate, setAttemptingCreate] = useState(false);
 
   const [profileImage, setProfileImage] = useState<string>(
     "/images/profile-pics/raven.jpg"
@@ -29,18 +32,35 @@ export default function NewDayClient({
       try {
         if (user) {
           const result = await axios.get(`/api/user/${user.id}`);
-          console.log("RESULT:", result.data.rows.length > 0);
           if (result.data.rows.length > 0) {
             //check which day it is progress to the next day
           } else {
             setNewUser(true);
-            setSellerName(user?.username ? user.username : "");
+            if(user?.username){
+              setSellerName(user?.username);
+              setCondidionsMet(true);
+            }
           }
         }
       } catch (error) {}
     };
     checkUserDbEntry();
   }, [user]);
+
+  const addNewUserToDbAndStart = async ()=>{
+    try {
+      setDbError(false);
+      const result = await axios.post("/api/user/", { user_id: user?.id, seller_name: sellerName, seller_image_url: profileImage, current_day: 1 });
+      if(result.data){
+        console.log("Success: ", result.data);
+        router.push("/");
+      }
+    } catch (error) {
+      console.error("Failed to post user to the db: ", error);
+      setDbError(true);
+      setAttemptingCreate(false);
+    }
+  }
 
   if (isLoaded && !isSignedIn) {
     router.push("/account/sign-in");
@@ -92,6 +112,12 @@ export default function NewDayClient({
                 maxLength={15}
                 onChange={(e) => {
                   setSellerName(e.target.value);
+                  if(e.target.value.trim() === ""){
+                    setCondidionsMet(false);
+                  }
+                  else{
+                    setCondidionsMet(true);
+                  }
                 }}
                 value={sellerName}
               ></TextInput>
@@ -115,9 +141,17 @@ export default function NewDayClient({
               <span className="mt-2">
                 Starting Cash: <span className="font-semibold">$100</span>
               </span>
-              <Button radius={"md"} className="mt-5 bg-green-700!">
-                Start Game
-              </Button>
+              { !attemptingCreate ?
+                (<Button radius={"md"} className="mt-5 bg-green-700!" disabled={!conditionsMet} onClick={()=>{
+                  setAttemptingCreate(true);
+                  addNewUserToDbAndStart()
+                }}>
+                  Start Game
+                </Button>)
+              : 
+              <div className="loader mt-5"></div>  
+              }
+              <div hidden={!dbError} className="mt-3 text-red-600">Database error, please try again</div>
             </div>
           </div>
         </div>

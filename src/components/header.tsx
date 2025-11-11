@@ -18,7 +18,8 @@ import {
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { SignedIn, useAuth, useUser } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
+import axios from "axios";
 
 export default function Header() {
   const { isLoaded, isSignedIn, user } = useUser();
@@ -49,6 +50,23 @@ export default function Header() {
       setSearchCategory("Category");
     }
   }, [location]);
+
+  useEffect(() => {
+    const checkUserDbEntry = async () => {
+      try {
+        if (user) {
+          const result = await axios.get(`/api/user/${user.id}`);
+          if(result.data.rows.length < 1){
+            console.log("No user db object");
+            router.push("/new-day")
+          }
+        }
+      } catch (error) {
+        console.error("Failed to check if User db object exists: ", error);
+      }
+    };
+    checkUserDbEntry();
+  }, [user]);
 
   const pushToBrowseURL = (category: string) => {
     router.push(
@@ -86,7 +104,7 @@ export default function Header() {
 
 {/* Top of header (links) */}
             <div className="header-top w-[100%] h-9 pl-3 pt-1 pb-1 bg-white flex flex-row gap-10 border-b border-b-stone-400">
-              {!SignedIn || !user?.firstName || !user.primaryEmailAddress 
+              {!isSignedIn 
                ? (
                 <div className="flex gap-1.5">
                   <Link
