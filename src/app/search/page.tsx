@@ -20,20 +20,18 @@ export default function Search() {
 
   const [searchResults, setSearchResults] = useState<Product[]>([]);
   const router = useRouter();
-  const {user} = useUser();
+  const { user } = useUser();
 
   const fetchSearchResults = async () => {
     try {
       setFetchedResults(false);
       setSearchResults([]);
-      console.log("Category: ", category);
       const result = await axios.post("/api/search", {
         query: query,
         category: category,
         page: page,
-        userId: user?.id
+        userId: user?.id,
       });
-      console.log("RESULTS:", result.data.products);
       setSearchResults(result.data.products);
       setTotalResults(result.data.count);
       setFetchedResults(true);
@@ -43,26 +41,26 @@ export default function Search() {
   };
 
   useEffect(() => {
-    if(user?.id){
+    if (user?.id) {
       fetchSearchResults();
     }
     const pg = searchParams.get("page");
-      setPage(Number(pg));
+    setPage(Number(pg));
   }, [query, category, user]);
 
   useEffect(() => {
-      const _st = query;
-      const encodedSearchTerm = encodeURIComponent(query ? query : "");
-      if (category) {
-        const encodedCategory = encodeURIComponent(category);
-        const url = `search?q=${encodedSearchTerm}&category=${category}&page=${page}`;
-        router.push(url);
-        fetchSearchResults();
-      } else {
-        const url = `search?q=${encodedSearchTerm}&page=${page}`;
-        router.push(url);
-        fetchSearchResults();
-      }
+    const _st = query;
+    const encodedSearchTerm = encodeURIComponent(query ? query : "");
+    if (category) {
+      const encodedCategory = encodeURIComponent(category);
+      const url = `search?q=${encodedSearchTerm}&category=${category}&page=${page}`;
+      router.push(url);
+      fetchSearchResults();
+    } else {
+      const url = `search?q=${encodedSearchTerm}&page=${page}`;
+      router.push(url);
+      fetchSearchResults();
+    }
   }, [page]);
 
   return (
@@ -79,28 +77,21 @@ export default function Search() {
               });
             })}
           </div>
-          <Pagination
-            className="mb-3 mt-auto!"
-            color="#246d24"
-            value={Number(page)}
-            total={Math.ceil(totalResults / 12)}
-            onChange={setPage}
-          />
+          <Pagination className="mb-3 mt-auto!" color="#246d24" value={Number(page)} total={Math.ceil(totalResults / 12)} onChange={setPage} />
         </div>
       ) : (
         <>
-          {
-            fetchedResults ? 
-            (<div>
+          {fetchedResults ? (
+            <div>
               <div className="flex flex-col items-center">
-              <span className="text-xl mt-10 font-bold">No Results</span>
+                <span className="text-xl mt-10 font-bold">No Results</span>
+              </div>
             </div>
-            </div>)
-            :
+          ) : (
             <div className="flex flex-col items-center">
               <div className="loader"></div>
             </div>
-          }
+          )}
         </>
       )}
     </div>

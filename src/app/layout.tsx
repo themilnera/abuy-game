@@ -2,11 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "@mantine/core/styles.css";
 import "@mantine/carousel/styles.css";
-import {
-  ColorSchemeScript,
-  MantineProvider,
-  mantineHtmlProps,
-} from "@mantine/core";
+import { ColorSchemeScript, MantineProvider, mantineHtmlProps } from "@mantine/core";
 import "./globals.css";
 import Header from "@/components/header";
 import { ClerkProvider } from "@clerk/nextjs";
@@ -32,9 +28,9 @@ export default function RootLayout({
         </head>
         <body className={`${inter.className} antialiased flex flex-col overflow-x-hidden`}>
           <MantineProvider>
-              <Header />
-              {children}
-              <Footer />
+            <Header />
+            {children}
+            <Footer />
           </MantineProvider>
         </body>
       </html>

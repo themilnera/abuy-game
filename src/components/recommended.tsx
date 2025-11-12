@@ -10,9 +10,8 @@ import axios from "axios";
 import { UserResource } from "@clerk/types";
 import { useUser } from "@clerk/nextjs";
 
-
 export default function Recommended() {
-    const { isLoaded, isSignedIn, user } = useUser();
+  const { isLoaded, isSignedIn, user } = useUser();
   const [slides, setSlides] = useState();
   const [loaded, setLoaded] = useState(false);
 
@@ -39,7 +38,6 @@ export default function Recommended() {
   };
 
   useEffect(() => {
-    console.log("Effect: ", {isLoaded, isSignedIn, userId: user?.id});
     if (isLoaded && isSignedIn && user) {
       fetchRecommendedItems();
     }
@@ -65,8 +63,7 @@ export default function Recommended() {
           w={`70vw`}
           slideGap="md"
           emblaOptions={{ align: "start", slidesToScroll: 2, loop: false }}
-          withIndicators={false}
-        >
+          withIndicators={false}>
           {slides}
         </Carousel>
       </div>

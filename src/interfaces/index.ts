@@ -17,7 +17,7 @@ export interface CardProps {
   id: string;
 }
 
-export interface SearchProps{
-    query: string;
-    category: string;
+export interface SearchProps {
+  query: string;
+  category: string;
 }

@@ -15,9 +15,7 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center h-[100vh]">
       <SpecialOffer />
-      <Recommended/>
-
-      
+      <Recommended />
     </div>
   );
 }

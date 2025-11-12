@@ -10,15 +10,7 @@ const pool = new Pool({
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const {
-      name,
-      category,
-      lowest_price,
-      highest_price,
-      rarity,
-      path,
-      description,
-    } = body;
+    const { name, category, lowest_price, highest_price, rarity, path, description } = body;
 
     const result = await pool.query(
       `INSERT INTO products (name, category, lowest_price, highest_price, rarity, path, description) 
@@ -30,10 +22,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(result.rows[0]);
   } catch (error) {
     console.error("Database error: ", error);
-    return NextResponse.json(
-      { error: "Failed to create product" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to create product" }, { status: 500 });
   }
 }
-

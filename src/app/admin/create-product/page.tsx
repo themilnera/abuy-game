@@ -1,24 +1,12 @@
 "use client";
 import Image from "next/image";
 
-import {
-  TextInput,
-  Button,
-  Textarea,
-  Modal,
-  Select,
-  Input,
-} from "@mantine/core";
-import {
-  IconArrowsRightLeft,
-  IconCurrency,
-  IconCurrencyDollar,
-} from "@tabler/icons-react";
+import { TextInput, Button, Textarea, Modal, Select, Input } from "@mantine/core";
+import { IconArrowsRightLeft, IconCurrency, IconCurrencyDollar } from "@tabler/icons-react";
 import { useState } from "react";
 import axios from "axios";
 import { useDisclosure } from "@mantine/hooks";
 import { Product } from "@/interfaces";
-
 
 export default function CreateProduct() {
   //CREATE PRODUCT
@@ -72,7 +60,6 @@ export default function CreateProduct() {
         open();
         clearAllFields();
 
-        console.log("Submitted product to database: ", result);
       } else {
         const result = await axios.put(`/api/products/${productId}`, {
           name: name,
@@ -83,7 +70,6 @@ export default function CreateProduct() {
           path: path,
           description: description,
         });
-        console.log("Updated product in database: ", result);
         setResultData(result.data);
         setResults(true);
         open();
@@ -97,9 +83,7 @@ export default function CreateProduct() {
   const loadProduct = async () => {
     try {
       close();
-      const result = await axios.get(
-        `/api/products/${productId ? productId : productName}`
-      );
+      const result = await axios.get(`/api/products/${productId ? productId : productName}`);
       const product = await result.data.product;
       setName(product.name);
       setCategory(product.category);
@@ -128,8 +112,7 @@ export default function CreateProduct() {
           close();
         }}
         withCloseButton={true}
-        centered
-      >
+        centered>
         {!results ? (
           <div className="flex flex-col items-center gap-5">
             <div className="flex gap-3 items-center">
@@ -141,79 +124,40 @@ export default function CreateProduct() {
                 onChange={(e) => setProductId(Number(e.target.value))}
                 value={productId}
                 label="Product ID?"
-                placeholder="id"
-              ></TextInput>
-              <TextInput
-                type="text"
-                onChange={(e) => setProductName(e.target.value)}
-                value={productName}
-                label="Product Name?"
-                placeholder="name"
-              ></TextInput>
+                placeholder="id"></TextInput>
+              <TextInput type="text" onChange={(e) => setProductName(e.target.value)} value={productName} label="Product Name?" placeholder="name"></TextInput>
             </div>
-            <Button
-              onClick={loadProduct}
-              disabled={
-                productId === 0 && productName.trim() === "" ? true : false
-              }
-              color="#5b2c2c"
-              className="w-35! mt-3"
-            >
+            <Button onClick={loadProduct} disabled={productId === 0 && productName.trim() === "" ? true : false} color="#5b2c2c" className="w-35! mt-3">
               Load Product
             </Button>
           </div>
         ) : (
           <div className="flex flex-col gap-3 justify-center">
-            <span className="text-2xl text-center mb-5 font-bold">
-              RESULT FROM DB:
+            <span className="text-2xl text-center mb-5 font-bold">RESULT FROM DB:</span>
+            <span className="bg-[#f4f4f4] rounded-md font-semibold flex justify-between items-center mr-5 ml-5 p-2">
+              Product Id: <span className="text-[#751111] font-semibold text-lg">{resultData?.id}</span>
             </span>
             <span className="bg-[#f4f4f4] rounded-md font-semibold flex justify-between items-center mr-5 ml-5 p-2">
-              Product Id:{" "}
-              <span className="text-[#751111] font-semibold text-lg">
-                {resultData?.id}
-              </span>
+              Product Name: <span className="text-[#116729] font-semibold text-lg">{resultData?.name}</span>
             </span>
             <span className="bg-[#f4f4f4] rounded-md font-semibold flex justify-between items-center mr-5 ml-5 p-2">
-              Product Name:{" "}
-              <span className="text-[#116729] font-semibold text-lg">
-                {resultData?.name}
-              </span>
+              Category: <span className="text-[#116729] font-semibold text-lg">{resultData?.category}</span>
             </span>
             <span className="bg-[#f4f4f4] rounded-md font-semibold flex justify-between items-center mr-5 ml-5 p-2">
-              Category:{" "}
-              <span className="text-[#116729] font-semibold text-lg">
-                {resultData?.category}
-              </span>
+              Highest Price: <span className="text-[#751111] font-semibold text-lg">{resultData?.highest_price}</span>
             </span>
             <span className="bg-[#f4f4f4] rounded-md font-semibold flex justify-between items-center mr-5 ml-5 p-2">
-              Highest Price:{" "}
-              <span className="text-[#751111] font-semibold text-lg">
-                {resultData?.highest_price}
-              </span>
+              Lowest Price: <span className="text-[#751111] font-semibold text-lg">{resultData?.lowest_price}</span>
             </span>
             <span className="bg-[#f4f4f4] rounded-md font-semibold flex justify-between items-center mr-5 ml-5 p-2">
-              Lowest Price:{" "}
-              <span className="text-[#751111] font-semibold text-lg">
-                {resultData?.lowest_price}
-              </span>
-            </span>
-            <span className="bg-[#f4f4f4] rounded-md font-semibold flex justify-between items-center mr-5 ml-5 p-2">
-              Rarity:{" "}
-              <span className="text-[#751111] font-semibold text-lg">
-                {resultData?.rarity}
-              </span>
+              Rarity: <span className="text-[#751111] font-semibold text-lg">{resultData?.rarity}</span>
             </span>
             <span className="bg-[#f4f4f4] rounded-md font-semibold flex justify-between mr-5 ml-5 p-2">
               <span className="self-start">Path:</span>
-              <span className="text-[#116729] font-semibold text-md ml-10">
-                {resultData?.path}
-              </span>
+              <span className="text-[#116729] font-semibold text-md ml-10">{resultData?.path}</span>
             </span>
             <span className="bg-[#f4f4f4] rounded-md font-semibold flex justify-between items-center mr-5 ml-5 p-2">
-              <span className="self-start">Description:</span>{" "}
-              <span className="text-[#116729] font-semibold text-sm ml-10">
-                {resultData?.description}
-              </span>
+              <span className="self-start">Description:</span> <span className="text-[#116729] font-semibold text-sm ml-10">{resultData?.description}</span>
             </span>
             <Button
               size="md"
@@ -224,17 +168,14 @@ export default function CreateProduct() {
                 }
                 close();
               }}
-              className="w-30! bg-[#5b2c2c]! hover:bg-[#422020]!  self-center mt-5"
-            >
+              className="w-30! bg-[#5b2c2c]! hover:bg-[#422020]!  self-center mt-5">
               Close
             </Button>
           </div>
         )}
       </Modal>
       <div className="flex flex-col items-center mb-5 mt-15">
-        <h1 className="text-2xl font-extrabold underline tracking-wider">
-          Add/Edit Product
-        </h1>
+        <h1 className="text-2xl font-extrabold underline tracking-wider">Add/Edit Product</h1>
 
         <div className="flex flex-col gap-3 md:w-150 w-100 items-center">
           <TextInput
@@ -308,18 +249,8 @@ export default function CreateProduct() {
             className="w-[100%]"
             placeholder="path"
           />
-          {(path.trim() !== "" && path.match(/.jpg/)) ||
-          path.match(/.png/) ||
-          path.match(/.tiff/) ||
-          path.match(/.avif/) ||
-          path.match(/.svg/) ? (
-            <Image
-              src={`/images${path}`}
-              alt="product"
-              width={200}
-              height={10}
-              className="mt-5"
-            ></Image>
+          {(path.trim() !== "" && path.match(/.jpg/)) || path.match(/.png/) || path.match(/.tiff/) || path.match(/.avif/) || path.match(/.svg/) ? (
+            <Image src={`/images${path}`} alt="product" width={200} height={10} className="mt-5"></Image>
           ) : (
             <></>
           )}
@@ -341,30 +272,21 @@ export default function CreateProduct() {
             <Button
               w={300}
               disabled={
-                name?.trim() == "" ||
-                category?.trim() == "" ||
-                lowestPrice === 0 ||
-                highestPrice === 0 ||
-                path?.trim() === "" ||
-                description?.trim() === ""
+                name?.trim() == "" || category?.trim() == "" || lowestPrice === 0 || highestPrice === 0 || path?.trim() === "" || description?.trim() === ""
                   ? true
                   : false
               }
-              onClick={submitProduct}
-            >
+              onClick={submitProduct}>
               {submitText}
             </Button>
-            { 
-          !newProduct ? (
-            <Button onClick={clearAllFields} color="#6d6234">Reset</Button>
-            )
-          : 
-           (<>
-           
-           </>)
-          }
+            {!newProduct ? (
+              <Button onClick={clearAllFields} color="#6d6234">
+                Reset
+              </Button>
+            ) : (
+              <></>
+            )}
           </div>
-          
         </div>
       </div>
     </>

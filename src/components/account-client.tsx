@@ -6,11 +6,7 @@ import { useEffect, useState } from "react";
 import { Button, Center, Image, Modal, TextInput } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { SignOutButton } from "@clerk/nextjs";
-export default function Account({
-  availableImages,
-}: {
-  availableImages: string[];
-}) {
+export default function Account({ availableImages }: { availableImages: string[] }) {
   const { isLoaded, isSignedIn, user } = useUser();
   const auth = useAuth();
   const [sellerName, setSellerName] = useState<string | null>();
@@ -25,17 +21,14 @@ export default function Account({
   //These are not in the db yet, add them
   const [itemsSold, setItemsSold] = useState(0);
   const [itemsPurchased, setItemsPurchased] = useState(0);
-  
 
   const fetchUserDbObject = async () => {
     try {
       const result = await axios.get(`/api/user/${user?.id}`);
       if (result.data.rows.length < 1) {
-        console.log("No user db object");
         router.push("/new-day");
       }
       const userObject = result.data.rows[0];
-      console.log(userObject);
       setSellerName(userObject.seller_name);
       setProfileImage(userObject.seller_image_url);
       setGameDay(userObject.current_day);
@@ -83,8 +76,7 @@ export default function Account({
             close();
           }}
           withCloseButton={true}
-          centered
-        >
+          centered>
           <div className="flex flex-wrap gap-5 items-center justify-center mb-10">
             {availableImages.map((name) => (
               <Image
@@ -113,36 +105,23 @@ export default function Account({
               router.push("/");
             }}
           />
-          <span className="mt-10 font-semibold text-2xl">
-            Account Dashboard
-          </span>
+          <span className="mt-10 font-semibold text-2xl">Account Dashboard</span>
           <div className="border-2  w-[70%] h-[100%] rounded-2xl mt-10 border-gray-700 bg-gray-400 flex flex-col">
             <div className="flex md:flex-row flex-col">
               <div className="m-10 flex flex-1 flex-col gap-5">
                 <span className="flex items-center">
-                  <span className="font-semibold flex-3">
-                    Change Seller Name:
-                  </span>
+                  <span className="font-semibold flex-3">Change Seller Name:</span>
                   <TextInput
                     className="flex-2"
                     value={sellerName}
                     radius={"md"}
                     onChange={(e) => {
                       setSellerName(e.target.value);
-                    }}
-                  ></TextInput>
+                    }}></TextInput>
                 </span>
 
                 <span className="flex items-center gap-5 font-semibold">
-                  Change Profile Image:{" "}
-                  <Image
-                    src={profileimage}
-                    w={150}
-                    h={150}
-                    radius={"lg"}
-                    className="hover:cursor-pointer"
-                    onClick={open}
-                  ></Image>{" "}
+                  Change Profile Image: <Image src={profileimage} w={150} h={150} radius={"lg"} className="hover:cursor-pointer" onClick={open}></Image>{" "}
                 </span>
 
                 <div className="flex justify-around mt-10 gap-3">
@@ -152,8 +131,7 @@ export default function Account({
                         updateUserDbObject();
                       }}
                       className="bg-green-600! flex-2"
-                      radius={"md"}
-                    >
+                      radius={"md"}>
                       Update
                     </Button>
                   ) : (
@@ -165,16 +143,13 @@ export default function Account({
                       auth.signOut();
                     }}
                     className="bg-blue-700! flex-1"
-                    radius={"md"}
-                  >
+                    radius={"md"}>
                     Log Out
                   </Button>
                 </div>
               </div>
               <div className="font-semibold m-5 h-[100%] p-5 flex flex-3 flex-col items-center gap-5 border-2 rounded-2xl border-gray-500 bg- bg-gray-500">
-                <span className="text-2xl text-gray-200">
-                  Current Game Stats
-                </span>
+                <span className="text-2xl text-gray-200">Current Game Stats</span>
                 <span className="w-[100%] border-b-1 bg-gray-400 p-2 rounded-md flex items-center justify-between">
                   <span>Game Day:</span> <span className="text-xl mr-3">{gameDay}</span>
                 </span>
@@ -190,9 +165,7 @@ export default function Account({
               </div>
             </div>
             <div className="mt-auto mb-5 self-center flex flex-col items-center gap-5">
-              <span className="text-xl font-bold underline underline-offset-7">
-                Danger Zone
-              </span>
+              <span className="text-xl font-bold underline underline-offset-7">Danger Zone</span>
               <div className="self-center flex gap-5 mb-5">
                 <Button className="bg-violet-900!">Reset All Stats</Button>
                 <Button className=" bg-red-900!">Delete Account</Button>

@@ -5,31 +5,20 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const { id } = await params;
 
-    const result = await pool.query("SELECT * FROM users WHERE user_id = $1", [
-      id,
-    ]);
+    const result = await pool.query("SELECT * FROM users WHERE user_id = $1", [id]);
 
     return NextResponse.json(result);
   } catch (error) {
     console.error("Database error:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch user" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch user" }, { status: 500 });
   }
 }
 
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const { id } = await params;
     const body = await request.json();

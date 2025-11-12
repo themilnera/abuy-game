@@ -40,10 +40,7 @@ export async function POST(req: NextRequest) {
       countLine = " WHERE name ILIKE $1 AND category ILIKE $2 ";
       paramArray = [`%${query}%`, `%${category}%`];
     }
-    const userResult = await pool.query(
-      `SELECT * FROM users WHERE user_id = $1`,
-      [userId]
-    );
+    const userResult = await pool.query(`SELECT * FROM users WHERE user_id = $1`, [userId]);
 
     let result, count;
     if (userResult.rows.length === 0) {
@@ -93,9 +90,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(results);
   } catch (error) {
     console.error("Database error:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch product" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch product" }, { status: 500 });
   }
 }

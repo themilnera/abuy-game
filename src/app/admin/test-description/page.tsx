@@ -44,7 +44,6 @@ export default function TestDescription() {
         const words = strip(descriptionText.toLowerCase())
           .split(/\s+/)
           .filter((word) => word.length > 0);
-        console.log("words: ", words);
         const checkWords = words.map(async (word) => {
           try {
             const result = await axios.post("/api/token-type/check", {
@@ -132,14 +131,9 @@ export default function TestDescription() {
             value={descriptionText}
             onChange={(e) => {
               setDescriptionText(e.target.value);
-            }}
-          ></Textarea>
+            }}></Textarea>
           {analyzeButtonEnabled ? (
-            <Button
-              onClick={analyzeText}
-              size="md"
-              className="mt-5 mb-5 bg-amber-800!"
-            >
+            <Button onClick={analyzeText} size="md" className="mt-5 mb-5 bg-amber-800!">
               Analyze
             </Button>
           ) : (
@@ -147,57 +141,15 @@ export default function TestDescription() {
           )}
           {finishedScoring ? (
             <div className="flex flex-wrap justify-center w-130 gap-3 mt-5">
-              {score.brash > 0 ? (
-                <div className="bg-red-400 p-5">Brash: {score.brash}</div>
-              ) : (
-                <></>
-              )}
-              {score.casual > 0 ? (
-                <div className="bg-blue-400 p-5">Casual: {score.casual}</div>
-              ) : (
-                <></>
-              )}
-              {score.warm > 0 ? (
-                <div className="bg-orange-400 p-5">Warm: {score.warm}</div>
-              ) : (
-                <></>
-              )}
-              {score.smooth > 0 ? (
-                <div className="bg-pink-400 p-5">Smooth: {score.smooth}</div>
-              ) : (
-                <></>
-              )}
-              {score.cringe > 0 ? (
-                <div className="bg-purple-400 p-5">Cringe: {score.cringe}</div>
-              ) : (
-                <></>
-              )}
-              {score.grandiose > 0 ? (
-                <div className="bg-emerald-400 p-5">
-                  Grandiose: {score.grandiose}
-                </div>
-              ) : (
-                <></>
-              )}
-              {score.insane > 0 ? (
-                <div className="bg-indigo-500 p-5">Insane: {score.insane}</div>
-              ) : (
-                <></>
-              )}
-              {score.literate > 0 ? (
-                <div className="bg-green-600 p-5">
-                  Literate: {score.literate}
-                </div>
-              ) : (
-                <></>
-              )}
-              {score.professional > 0 ? (
-                <div className="bg-gray-400 p-5">
-                  Professional: {score.professional}
-                </div>
-              ) : (
-                <></>
-              )}
+              {score.brash > 0 ? <div className="bg-red-400 p-5">Brash: {score.brash}</div> : <></>}
+              {score.casual > 0 ? <div className="bg-blue-400 p-5">Casual: {score.casual}</div> : <></>}
+              {score.warm > 0 ? <div className="bg-orange-400 p-5">Warm: {score.warm}</div> : <></>}
+              {score.smooth > 0 ? <div className="bg-pink-400 p-5">Smooth: {score.smooth}</div> : <></>}
+              {score.cringe > 0 ? <div className="bg-purple-400 p-5">Cringe: {score.cringe}</div> : <></>}
+              {score.grandiose > 0 ? <div className="bg-emerald-400 p-5">Grandiose: {score.grandiose}</div> : <></>}
+              {score.insane > 0 ? <div className="bg-indigo-500 p-5">Insane: {score.insane}</div> : <></>}
+              {score.literate > 0 ? <div className="bg-green-600 p-5">Literate: {score.literate}</div> : <></>}
+              {score.professional > 0 ? <div className="bg-gray-400 p-5">Professional: {score.professional}</div> : <></>}
               {/* Neutral */}
               {score.brash === 0 &&
               score.warm === 0 &&

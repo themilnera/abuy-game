@@ -8,11 +8,7 @@ import { useEffect, useState } from "react";
 import { Button, Image, Modal, TextInput } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 
-export default function NewDayClient({
-  availableImages,
-}: {
-  availableImages: string[];
-}) {
+export default function NewDayClient({ availableImages }: { availableImages: string[] }) {
   const { isLoaded, isSignedIn, user } = useUser();
   const router = useRouter();
   const [newUser, setNewUser] = useState(false);
@@ -21,12 +17,10 @@ export default function NewDayClient({
   const [dbError, setDbError] = useState(false);
   const [attemptingCreate, setAttemptingCreate] = useState(false);
 
-  const [profileImage, setProfileImage] = useState<string>(
-    "/images/profile-pics/raven.jpg"
-  );
+  const [profileImage, setProfileImage] = useState<string>("/images/profile-pics/raven.jpg");
 
   const [opened, { open, close }] = useDisclosure(false);
-  //database user object check
+
   useEffect(() => {
     const checkUserDbEntry = async () => {
       try {
@@ -36,7 +30,7 @@ export default function NewDayClient({
             //check which day it is progress to the next day
           } else {
             setNewUser(true);
-            if(user?.username){
+            if (user?.username) {
               setSellerName(user?.username);
               setCondidionsMet(true);
             }
@@ -47,12 +41,11 @@ export default function NewDayClient({
     checkUserDbEntry();
   }, [user]);
 
-  const addNewUserToDbAndStart = async ()=>{
+  const addNewUserToDbAndStart = async () => {
     try {
       setDbError(false);
       const result = await axios.post("/api/user/", { user_id: user?.id, seller_name: sellerName, seller_image_url: profileImage, current_day: 1, money: 100 });
-      if(result.data){
-        console.log("Success: ", result.data);
+      if (result.data) {
         router.push("/");
       }
     } catch (error) {
@@ -60,7 +53,7 @@ export default function NewDayClient({
       setDbError(true);
       setAttemptingCreate(false);
     }
-  }
+  };
 
   if (isLoaded && !isSignedIn) {
     router.push("/account/sign-in");
@@ -68,25 +61,32 @@ export default function NewDayClient({
   }
   return (
     <>
-    <Modal
-      size={"lg"}
-      opened={opened}
-      onClose={() => {
-        close();
-      }}
-      withCloseButton={true}
-      centered
-    >
-      <div className="flex flex-wrap gap-5 items-center justify-center mb-10">
-        {availableImages.map(name => (
-          <Image className="hover:cursor-pointer" onClick={()=>{
-            setProfileImage(`/images/profile-pics/${name}`)
-            close();
-          }} radius={'lg'} key={name} w={150} h={150} src={`/images/profile-pics/${name}`}/>
-        ))}
-      </div>
-    </Modal>
-    
+      <Modal
+        size={"lg"}
+        opened={opened}
+        onClose={() => {
+          close();
+        }}
+        withCloseButton={true}
+        centered>
+        <div className="flex flex-wrap gap-5 items-center justify-center mb-10">
+          {availableImages.map((name) => (
+            <Image
+              className="hover:cursor-pointer"
+              onClick={() => {
+                setProfileImage(`/images/profile-pics/${name}`);
+                close();
+              }}
+              radius={"lg"}
+              key={name}
+              w={150}
+              h={150}
+              src={`/images/profile-pics/${name}`}
+            />
+          ))}
+        </div>
+      </Modal>
+
       {newUser ? (
         <div className="flex flex-col items-center justify-center">
           <div className="w-[75%] min-h-200 border-2 tracking-tight border-blue-900 rounded-2xl mt-10 flex flex-col items-center  bg-[#c9e3e5]">
@@ -97,13 +97,8 @@ export default function NewDayClient({
                 <span className="text-blue-700">U</span>
                 <span className="text-yellow-600">Y</span>!
               </span>
-              <span className="mt-5 font-semibold">
-                This site is a satirical management simulator game.
-              </span>
-              <span>
-                Since you're new here, let's create your user profile for the
-                site:
-              </span>
+              <span className="mt-5 font-semibold">This site is a satirical management simulator game.</span>
+              <span>Since you're new here, let's create your user profile for the site:</span>
 
               <TextInput
                 className="mt-10"
@@ -113,46 +108,40 @@ export default function NewDayClient({
                 maxLength={15}
                 onChange={(e) => {
                   setSellerName(e.target.value);
-                  if(e.target.value.trim() === ""){
+                  if (e.target.value.trim() === "") {
                     setCondidionsMet(false);
-                  }
-                  else{
+                  } else {
                     setCondidionsMet(true);
                   }
                 }}
-                value={sellerName}
-              ></TextInput>
-              <Button
-                radius={"md"}
-                className="mt-5 bg-blue-900!"
-                onClick={open}
-              >
+                value={sellerName}></TextInput>
+              <Button radius={"md"} className="mt-5 bg-blue-900!" onClick={open}>
                 Choose Profile Image
               </Button>
-              <Image
-                radius={"lg"}
-                src={profileImage}
-                w={200}
-                h={200}
-                className="mt-5"
-              ></Image>
+              <Image radius={"lg"} src={profileImage} w={200} h={200} className="mt-5"></Image>
               <span className="mt-5">
                 Day: <span className="font-semibold">1</span>
               </span>
               <span className="mt-2">
                 Starting Cash: <span className="font-semibold">$100</span>
               </span>
-              { !attemptingCreate ?
-                (<Button radius={"md"} className="mt-5 bg-green-700!" disabled={!conditionsMet} onClick={()=>{
-                  setAttemptingCreate(true);
-                  addNewUserToDbAndStart()
-                }}>
+              {!attemptingCreate ? (
+                <Button
+                  radius={"md"}
+                  className="mt-5 bg-green-700!"
+                  disabled={!conditionsMet}
+                  onClick={() => {
+                    setAttemptingCreate(true);
+                    addNewUserToDbAndStart();
+                  }}>
                   Start Game
-                </Button>)
-              : 
-              <div className="loader mt-5"></div>  
-              }
-              <div hidden={!dbError} className="mt-3 text-red-600">Database error, please try again</div>
+                </Button>
+              ) : (
+                <div className="loader mt-5"></div>
+              )}
+              <div hidden={!dbError} className="mt-3 text-red-600">
+                Database error, please try again
+              </div>
             </div>
           </div>
         </div>

@@ -26,9 +26,7 @@ export default function KeywordConstructor() {
         const tkn = result.data.result.rows[0];
         setLine(tkn.id);
         setToken(tkn.token);
-        setSelectedTypes(
-          tkn.types.split(" ").filter((t: string) => t !== "neutral")
-        );
+        setSelectedTypes(tkn.types.split(" ").filter((t: string) => t !== "neutral"));
         setLoadId(undefined);
       } catch (error) {
         console.error("Failed ot load token type: ", error);
@@ -62,28 +60,24 @@ export default function KeywordConstructor() {
             radius={"md"}
             onChange={(e) => {
               setLoadId(Number(e.target.value));
-            }}
-          ></TextInput>
+            }}></TextInput>
           <Button
             onClick={() => {
               loadTokenType(loadId);
             }}
-            className="bg-red-900!"
-          >
+            className="bg-red-900!">
             Load
           </Button>
         </span>
         <span>
-          <span className="font-bold tracking-wide text-lg underline">ID:</span>{" "}
-          {line.toString()}
+          <span className="font-bold tracking-wide text-lg underline">ID:</span> {line.toString()}
         </span>
         <TextInput
           className="flex! tracking-wide! flex-col text-center mt-2"
           radius={"md"}
           value={!token ? "" : token}
           fw={650}
-          onChange={(e) => setToken(e.target.value)}
-        ></TextInput>
+          onChange={(e) => setToken(e.target.value)}></TextInput>
         <Stack className="mt-5 flex! flex-row! border-1 border-red-300 p-5 rounded-2xl bg-red-100">
           <span className="flex flex-col gap-4">
             {/* <Checkbox
@@ -92,62 +86,22 @@ export default function KeywordConstructor() {
             /> 
             Maybe we don't need this, neutral means no other selection
             */}
-            <Checkbox
-              checked={selectedTypes.includes("literate")}
-              onChange={(e) => toggleType("literate", e.target.checked)}
-              label="Literate"
-              fw={600}
-            />
-            <Checkbox
-              checked={selectedTypes.includes("casual")}
-              onChange={(e) => toggleType("casual", e.target.checked)}
-              fw={600}
-              label="Casual"
-            />
+            <Checkbox checked={selectedTypes.includes("literate")} onChange={(e) => toggleType("literate", e.target.checked)} label="Literate" fw={600} />
+            <Checkbox checked={selectedTypes.includes("casual")} onChange={(e) => toggleType("casual", e.target.checked)} fw={600} label="Casual" />
             <Checkbox
               checked={selectedTypes.includes("professional")}
               onChange={(e) => toggleType("professional", e.target.checked)}
               fw={600}
               label="Professional"
             />
-            <Checkbox
-              checked={selectedTypes.includes("grandiose")}
-              onChange={(e) => toggleType("grandiose", e.target.checked)}
-              fw={600}
-              label="Grandiose"
-            />
+            <Checkbox checked={selectedTypes.includes("grandiose")} onChange={(e) => toggleType("grandiose", e.target.checked)} fw={600} label="Grandiose" />
           </span>
           <span className="flex flex-col gap-2">
-            <Checkbox
-              checked={selectedTypes.includes("brash")}
-              onChange={(e) => toggleType("brash", e.target.checked)}
-              fw={600}
-              label="Brash"
-            />
-            <Checkbox
-              checked={selectedTypes.includes("smooth")}
-              onChange={(e) => toggleType("smooth", e.target.checked)}
-              fw={600}
-              label="Smooth"
-            />
-            <Checkbox
-              checked={selectedTypes.includes("warm")}
-              onChange={(e) => toggleType("warm", e.target.checked)}
-              fw={600}
-              label="Warm"
-            />
-            <Checkbox
-              checked={selectedTypes.includes("cringe")}
-              onChange={(e) => toggleType("cringe", e.target.checked)}
-              fw={600}
-              label="Cringe"
-            />
-            <Checkbox
-              checked={selectedTypes.includes("insane")}
-              onChange={(e) => toggleType("insane", e.target.checked)}
-              fw={600}
-              label="Insane"
-            />
+            <Checkbox checked={selectedTypes.includes("brash")} onChange={(e) => toggleType("brash", e.target.checked)} fw={600} label="Brash" />
+            <Checkbox checked={selectedTypes.includes("smooth")} onChange={(e) => toggleType("smooth", e.target.checked)} fw={600} label="Smooth" />
+            <Checkbox checked={selectedTypes.includes("warm")} onChange={(e) => toggleType("warm", e.target.checked)} fw={600} label="Warm" />
+            <Checkbox checked={selectedTypes.includes("cringe")} onChange={(e) => toggleType("cringe", e.target.checked)} fw={600} label="Cringe" />
+            <Checkbox checked={selectedTypes.includes("insane")} onChange={(e) => toggleType("insane", e.target.checked)} fw={600} label="Insane" />
           </span>
         </Stack>
         <Textarea
@@ -162,8 +116,7 @@ export default function KeywordConstructor() {
             setSelectedTypes(e.target.value.split(" ").filter((t) => t.trim()));
           }}
           autoFocus
-          radius={"md"}
-        ></Textarea>
+          radius={"md"}></Textarea>
         <div className="flex gap-3">
           <Button className="mt-5 bg-amber-950!">Remove</Button>
           <Button className="mt-5 bg-blue-600!" onClick={pushAndNextToken}>
