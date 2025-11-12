@@ -37,7 +37,6 @@ export default function Search() {
       setSearchResults(result.data.products);
       setTotalResults(result.data.count);
       setFetchedResults(true);
-      
     } catch (error) {
       console.error("Failed to fetch search results: ", error);
     }
@@ -52,12 +51,10 @@ export default function Search() {
   }, [query, category, user]);
 
   useEffect(() => {
-
       const _st = query;
       const encodedSearchTerm = encodeURIComponent(query ? query : "");
       if (category) {
         const encodedCategory = encodeURIComponent(category);
-
         const url = `search?q=${encodedSearchTerm}&category=${category}&page=${page}`;
         router.push(url);
         fetchSearchResults();
@@ -66,11 +63,7 @@ export default function Search() {
         router.push(url);
         fetchSearchResults();
       }
-      
-    
   }, [page]);
-
-
 
   return (
     <div className="h-[120vh]">

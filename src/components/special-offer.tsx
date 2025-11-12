@@ -4,8 +4,6 @@ import axios from "axios";
 import { Product } from "@/interfaces";
 import { useRouter } from "next/navigation";
 
-//todo: need to find a better way to make the styling responsive
-
 export default function SpecialOffer() {
   const router = useRouter();
   const bgColorOptions = ["#0a380a","#0a2838","#380a0a","#380a1d","#381c0a"];

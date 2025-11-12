@@ -4,7 +4,7 @@ export interface Product {
   category: string;
   lowest_price: number;
   highest_price: number;
-  current_price: number;
+  current_price: string;
   rarity: number;
   path: string;
   description: string;
@@ -12,7 +12,7 @@ export interface Product {
 
 export interface CardProps {
   name: string;
-  price: number;
+  price: string;
   path: string;
   id: string;
 }

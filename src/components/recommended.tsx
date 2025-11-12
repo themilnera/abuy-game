@@ -10,6 +10,7 @@ import axios from "axios";
 import { UserResource } from "@clerk/types";
 import { useUser } from "@clerk/nextjs";
 
+
 export default function Recommended() {
     const { isLoaded, isSignedIn, user } = useUser();
   const [slides, setSlides] = useState();

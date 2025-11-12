@@ -2,6 +2,10 @@ import { Text, Paper, Image } from "@mantine/core";
 import { CardProps } from "@/interfaces";
 import Link from "next/link";
 
+function cashFormatter(cash: string) {
+  return Number(cash).toLocaleString('en-US');
+}
+
 export default function CarouselCard({ name, price, path, id }: CardProps) {
   return (
     <Paper
@@ -22,7 +26,7 @@ export default function CarouselCard({ name, price, path, id }: CardProps) {
       </div>
       <div className="mt-auto p-2 self-start">
         <Text>{name}</Text>
-        <Text fw={700}>${price}</Text>
+        <Text fw={700}>${cashFormatter(price)}</Text>
       </div>
     </Paper>
   );

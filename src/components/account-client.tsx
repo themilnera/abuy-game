@@ -1,29 +1,36 @@
 "use client";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button, Center, Image, Modal, TextInput } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { SignOutButton } from "@clerk/nextjs";
 export default function Account({
   availableImages,
 }: {
   availableImages: string[];
 }) {
-  const { isLoaded, isSignedIn, userId, sessionId, getToken } = useAuth();
+  const { isLoaded, isSignedIn, user } = useUser();
+  const auth = useAuth();
   const [sellerName, setSellerName] = useState<string | null>();
   const router = useRouter();
   const [opened, { open, close }] = useDisclosure(false);
   const [profileimage, setProfileImage] = useState<string>();
+  const [gameDay, setGameDay] = useState();
+
   const fetchUserDbObject = async () => {
     try {
-      const result = await axios.get(`/api/user/${userId}`);
+      const result = await axios.get(`/api/user/${user?.id}`);
       if (result.data.rows.length < 1) {
         console.log("No user db object");
         router.push("/new-day");
       }
-      setSellerName(result.data.rows[0].seller_name);
-      setProfileImage(result.data.rows[0].seller_image_url);
+      const userObject = result.data.rows[0];
+      console.log(userObject)
+      setSellerName(userObject.seller_name);
+      setProfileImage(userObject.seller_image_url);
+      setGameDay(userObject.current_day);
     } catch (error) {
       console.error("Failed to fetch userDbObject: ", error);
     }
@@ -32,10 +39,10 @@ export default function Account({
   useEffect(() => {
     if (isLoaded && !isSignedIn) {
       router.push("/account/sign-in");
-    } else if (isLoaded && isSignedIn) {
+    } else if (isLoaded && isSignedIn && !sellerName) {
       fetchUserDbObject();
     }
-  }, [isLoaded, isSignedIn, router]);
+  }, [isLoaded, isSignedIn, router, user]);
 
   if (!isLoaded) {
     return (
@@ -114,6 +121,9 @@ export default function Account({
                     onClick={open}
                   ></Image>{" "}
                 </span>
+                  <Button onClick={()=>{
+                    auth.signOut();
+                  }} className="bg-blue-700!" radius={'md'}>Log Out</Button>
               </div>
               <div className="font-semibold m-5 h-[100%] p-5 flex flex-3 flex-col items-center gap-5 border-2 rounded-2xl border-gray-500 bg- bg-gray-500">
                 <span className="text-2xl text-gray-200">
@@ -127,7 +137,7 @@ export default function Account({
               </div>
             </div>
             <div className="mt-auto mb-5 self-center flex flex-col items-center gap-5">
-                <span className="text-xl font-bold">Danger Zone</span>
+                <span className="text-xl font-bold underline underline-offset-7">Danger Zone</span>
                 <div className="self-center flex gap-5 mb-5">
                     <Button className="bg-violet-900!">Reset All Stats</Button>
                     <Button className=" bg-red-900!">Delete Account</Button>
