@@ -6,6 +6,7 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
+//create product
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();

@@ -6,6 +6,7 @@ import { Carousel } from "@mantine/carousel";
 import Recommended from "@/components/recommended";
 import { useState } from "react";
 import Link from "next/link";
+import { useUser } from "@clerk/nextjs";
 
 export default function Home() {
   const [isSearching, setIsSearching] = useState(false);
@@ -14,7 +15,7 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center h-[100vh]">
       <SpecialOffer />
-      <Recommended />
+      <Recommended/>
 
       
     </div>

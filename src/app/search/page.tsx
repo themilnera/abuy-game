@@ -7,6 +7,7 @@ import { CardProps, Product } from "@/interfaces";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Card from "@/components/search-card";
+import { useUser } from "@clerk/nextjs";
 
 export default function Search() {
   const searchParams = useSearchParams();
@@ -19,6 +20,7 @@ export default function Search() {
 
   const [searchResults, setSearchResults] = useState<Product[]>([]);
   const router = useRouter();
+  const {user} = useUser();
 
   const fetchSearchResults = async () => {
     try {
@@ -29,6 +31,7 @@ export default function Search() {
         query: query,
         category: category,
         page: page,
+        userId: user?.id
       });
       console.log("RESULTS:", result.data.products);
       setSearchResults(result.data.products);
@@ -41,10 +44,12 @@ export default function Search() {
   };
 
   useEffect(() => {
-    fetchSearchResults();
+    if(user?.id){
+      fetchSearchResults();
+    }
     const pg = searchParams.get("page");
       setPage(Number(pg));
-  }, [query, category]);
+  }, [query, category, user]);
 
   useEffect(() => {
 
@@ -75,7 +80,7 @@ export default function Search() {
             {searchResults?.map((product) => {
               return Card({
                 name: product.name,
-                price: product.lowest_price,
+                price: product.current_price,
                 path: product.path,
                 id: product.id,
               });

@@ -4,6 +4,7 @@ export interface Product {
   category: string;
   lowest_price: number;
   highest_price: number;
+  current_price: number;
   rarity: number;
   path: string;
   description: string;

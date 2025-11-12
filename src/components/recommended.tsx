@@ -7,23 +7,29 @@ import { CardProps, Product } from "@/interfaces";
 import Card from "./carousel-card";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { UserResource } from "@clerk/types";
+import { useUser } from "@clerk/nextjs";
 
 export default function Recommended() {
+    const { isLoaded, isSignedIn, user } = useUser();
   const [slides, setSlides] = useState();
   const [loaded, setLoaded] = useState(false);
 
   const fetchRecommendedItems = async () => {
     try {
-      const results = await axios.post("/api/products/random", { amount: 8 });
+      const results = await axios.post("/api/products/random", {
+        amount: 8,
+        userId: user?.id,
+      });
       const definedSlides = results.data.rows.map((product: Product) => {
         return (
           <Carousel.Slide key={product.name}>
-            <Card {...product} price={product.lowest_price} />
+            <Card {...product} price={product.current_price} />
           </Carousel.Slide>
         );
       });
       setSlides(definedSlides);
-      if(definedSlides){
+      if (definedSlides) {
         setLoaded(true);
       }
     } catch (error) {
@@ -32,8 +38,11 @@ export default function Recommended() {
   };
 
   useEffect(() => {
-    fetchRecommendedItems();
-  }, []);
+    console.log("Effect: ", {isLoaded, isSignedIn, userId: user?.id});
+    if (isLoaded && isSignedIn && user) {
+      fetchRecommendedItems();
+    }
+  }, [isLoaded, isSignedIn, user]);
 
   if (!loaded) {
     return (

@@ -11,11 +11,20 @@ interface Context {
   };
 }
 
+function seedToFloat(seed: string) {
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = (hash << 5) - hash + seed.charCodeAt(i);
+    hash = hash & hash;
+  }
+  return (hash % 1000) / 1000;
+}
+
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } } 
-  //destructure  { params }: from an object { which contains params: { which is an object with value id: which is a string }}
-) {
+  { params }: { params: { id: string } }
+) //destructure  { params }: from an object { which contains params: { which is an object with value id: which is a string }}
+{
   try {
     const { id } = await params;
     const body = await req.json();
@@ -64,12 +73,17 @@ export async function PUT(
   }
 }
 
-export async function GET(
+//get product, not create
+//needs to be a post so we can get the seed
+export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
     const { id } = await params;
+    const body = await request.json();
+    const { userId } = body;
+
     if (isNaN(Number(id))) {
       const result = await pool.query(
         "SELECT * FROM products WHERE name = $1",
@@ -90,9 +104,21 @@ export async function GET(
       }
       return NextResponse.json({ product: result.rows[0] });
     }
+    let seed;
+    if (userId) {
+      const userResult = await pool.query(
+        `SELECT * FROM users WHERE user_id = $1`,
+        [userId]
+      );
+      seed = userResult.rows[0].current_day_seed;
+    }
 
-    const result = await pool.query("SELECT * FROM products WHERE id = $1", [
-      id,
+    const result = await pool.query(`SELECT *, 
+        ROUND(lowest_price + (highest_price - lowest_price) * 
+  ((hashtext(id::text || $2) & 2147483647) / 2147483647.0)) AS current_price 
+        FROM products 
+        WHERE id = $1`, [
+      id, seed
     ]);
 
     if (result.rows.length === 0) {
