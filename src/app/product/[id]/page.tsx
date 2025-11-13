@@ -4,11 +4,13 @@ import { useUser } from "@clerk/nextjs";
 import { Button, Image } from "@mantine/core";
 import axios from "axios";
 import { use, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [product, setProduct] = useState<Product | null>(null);
   const { user } = useUser();
+  const router = useRouter();
 
   const fetchProductWithId = async () => {
     try {
@@ -21,7 +23,11 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
 
   const addProductToCartAndPushToCartPage = async () => {
     try {
-    } catch (error) {}
+      const result = await axios.put(`/api/user/cart`, { user_id: user?.id, cart_item_id: product?.id });
+      router.push("/cart");
+    } catch (error) {
+      console.error("Failed to add to cart: ", error);
+    }
   };
 
   useEffect(() => {
@@ -42,7 +48,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
               <span className="border-gray-400 border-t-1 p-2 pt-4 pb-4">{product.description}</span>
               {product.rarity < 3 ? (
                 <Button pt={3} pb={3} h={44} radius={"lg"} className="text-[18px]!" onClick={addProductToCartAndPushToCartPage}>
-                  Buy Now
+                  Add To Cart
                 </Button>
               ) : (
                 <Button pt={3} pb={3} h={44} radius={"lg"} className="text-[18px]!">
