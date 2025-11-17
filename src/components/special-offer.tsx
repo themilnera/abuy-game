@@ -52,9 +52,7 @@ export default function SpecialOffer() {
 
   if (!loaded) {
     return (
-      <div className="flex flex-col">
-        <div className="loader"></div>
-      </div>
+      <></>
     );
   } else if (product && blurb)
     return (

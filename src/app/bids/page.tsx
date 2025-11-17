@@ -85,19 +85,19 @@ export default function Bids() {
         <div className="flex flex-col items-center">
           <div className="text-2xl font-bold">My Bids</div>
           <div className="w-[70%] min-h-140 rounded-2xl mt-10 flex md:flex-row flex-col gap-5">
-            <div className="flex-5 flex flex-col border-1 rounded-2xl border-[#888888] bg-[#c5c5c5] h-[100%]">
+            <div className="flex-5 flex flex-col rounded-2xl   h-[100%]">
               {bids.map((bid, index) => {
                 return (
-                  <div key={bid.product.name + index}>
+                  <div key={bid.product.name + index} className="bg-[#c5c5c5] border-1 rounded-2xl mb-2 border-[#888888]">
                     <div className="flex md:flex-row flex-col items-center p-5 justify-between ">
                       <div className="flex items-center gap-5">
                         <Image src={`/images/${bid.product.path}`} w={120} h={120} radius={"lg"}></Image>
-                        <span className="font-semibold md:text-xl text-md text-center border-1 rounded-4xl p-2 bg-gray-200">
-                          <Link href={`/product/${bid.product.id}`}>{bid.product.name}</Link>
+                        <span className="font-semibold md:text-xl text-md text-center p-3 ">
+                          <Link className="hover:underline underline-offset-5" href={`/product/${bid.product.id}`}>{bid.product.name}</Link>
                         </span>
                       </div>
                       <div className="flex items-center gap-5 md:mt-0 mt-5">
-                        <span className="flex items-center font-semibold md:text-xl text-md text-center tracking-tight mr-4 border-b-1"><span className="font-medium">Current Bid:</span> <span className="font-bold">${bid.amount}</span></span>
+                        <span className="flex items-center font-semibold md:text-xl text-md text-center tracking-tight mr-4 border-b-1 gap-5"><span className="font-medium">Current Bid:</span> <span className="font-bold">${bid.amount}</span></span>
                         <span
                           className="hover:cursor-pointer"
                           onClick={() => {
@@ -120,6 +120,9 @@ export default function Bids() {
   } else if (!emptyBidsList) {
     return <div className="loader"></div>;
   } else {
-    return <>No bids</>;
+    return <div className="flex flex-col items-center h-[70vh]">
+            <div className="text-2xl font-semibold">You have no active bids!</div>
+            <Recommended/>
+          </div>
   }
 }
