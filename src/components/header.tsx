@@ -3,7 +3,7 @@ import { Button, Menu, NavLink, TextInput, Tooltip, UnstyledButton } from "@mant
 import Image from "next/image";
 import Link from "next/link";
 
-import { IconBell, IconCaretDownFilled, IconShoppingCart } from "@tabler/icons-react";
+import { IconAlertHexagon, IconBell, IconCaretDownFilled, IconShoppingCart } from "@tabler/icons-react";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -118,7 +118,10 @@ export default function Header() {
                     <IconBell />
                   </Link>
                 </Tooltip>
-                <Tooltip label="My shopping cart" offset={1}>
+                <Tooltip label="My Watchlist" offset={1}>
+                  <span className="hover:cursor-pointer"><IconAlertHexagon/></span>
+                </Tooltip>
+                <Tooltip label="My Shopping Cart" offset={1}>
                   <Link href="/cart">
                     <IconShoppingCart />
                   </Link>

@@ -9,16 +9,22 @@ import { useDisclosure } from "@mantine/hooks";
 import { IconCurrencyDollar } from "@tabler/icons-react";
 
 export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
+  const router = useRouter();
   const { id } = use(params);
+  const { user } = useUser();
+  const [opened, { open, close }] = useDisclosure(false);
+  
   const [product, setProduct] = useState<Product | null>(null);
-  const [cartButtonText, setCartButtonText] = useState("Add To Cart");
-  const [bidButtonText, setBidButtonText] = useState("Place Bid");
+  const [bidAmount, setBidAmount] = useState(0);
+  
   const [productInCart, setProductInCart] = useState(false);
   const [bidInList, setBidInList] = useState(false);
-  const [bidAmount, setBidAmount] = useState(0);
-  const { user } = useUser();
-  const router = useRouter();
-  const [opened, { open, close }] = useDisclosure(false);
+  const [productInWatchlist, setProductInWatchlist] = useState(false);
+  const [watchlistIds, setWatchlistIds]= useState<string[]>([]);
+
+  const [cartButtonText, setCartButtonText] = useState("Add To Cart");
+  const [bidButtonText, setBidButtonText] = useState("Place Bid");
+  const [watchlistButtonText, setWatchlistButtonText] = useState("Add to My Watchlist");
 
   const fetchProductWithId = async () => {
     try {
@@ -51,6 +57,18 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
             });
           }
         }
+        const wResult = await axios.post(`/api/user/watchlist`, { user_id: user?.id });
+        const fetchedWlIds: string[] = wResult.data.rows[0].watchlist_items?.trim().split(" ");
+        if(fetchedWlIds){
+          fetchedWlIds.forEach((wlId)=>{
+            if(wlId == result.data.product.id){
+              setProductInWatchlist(true);
+              setWatchlistButtonText("Remove From Watchlist")
+            }
+          })
+          setWatchlistIds(fetchedWlIds);
+        }
+
         setProduct(result.data.product);
         setBidAmount(Number(result.data.product.current_price));
       }
@@ -80,6 +98,27 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
       console.error("Failed to add item to bids: ", error);
     }
   };
+
+  const toggleProductInWatchlist = async () =>{
+    try{
+      if(!productInWatchlist){
+        const result = await axios.put(`/api/user/watchlist`, { user_id: user?.id, watchlist_item_id: product?.id });
+        if(result.status === 200){
+          setWatchlistButtonText("Remove From Watchlist");
+          setProductInWatchlist(true);
+        }
+      }
+      else{
+        const newWatchlistIds = watchlistIds.filter((id)=>id !== product?.id);
+        const result = await axios.put(`/api/user/watchlist/remove`, { user_id: user?.id, watchlist_items: newWatchlistIds.join(" ")})
+        setWatchlistButtonText("Add to My Watchlist");
+        setProductInWatchlist(false);
+      }
+    }
+    catch(error){
+      console.error("Failed to toggle watchlist item: ", error);
+    }
+  }
 
   useEffect(() => {
     if (user?.id) {
@@ -153,8 +192,8 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                     {bidButtonText}
                   </Button>
                 )}
-                <Button variant="outline" pt={3} pb={3} h={44} radius={"lg"} className="text-[18px]! text-[#20598d]!">
-                  Add to My Watchlist
+                <Button onClick={toggleProductInWatchlist} variant="outline" pt={3} pb={3} h={44} radius={"lg"} className="text-[18px]! text-[#20598d]!">
+                  {watchlistButtonText}
                 </Button>
               </div>
             </div>
