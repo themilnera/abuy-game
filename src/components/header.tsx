@@ -112,7 +112,7 @@ export default function Header() {
 
               <div className="flex gap-5 ml-auto mr-5">
                 <Link href="/sell">Sell</Link>
-                <Link href="/my-bids">Bids</Link>
+                <Link href="/bids">Bids</Link>
                 <Tooltip label="Notifications" offset={1}>
                   <Link href="/notifications">
                     <IconBell />

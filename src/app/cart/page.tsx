@@ -1,16 +1,12 @@
 "use client";
-import { Product } from "@/interfaces";
+import Recommended from "@/components/recommended";
+import { Product, ProductQuantity } from "@/interfaces";
 import { useUser } from "@clerk/nextjs";
 import { Button, Image, NumberInput } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
 import axios from "axios";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-
-interface ProductQuantity {
-  product: Product;
-  quantity: number;
-}
 
 export default function Cart() {
   const { user, isLoaded } = useUser();
@@ -43,7 +39,7 @@ export default function Cart() {
       await axios.put(`/api/user/cart/remove`, { user_id: user?.id, cart_items: newCartString});
 
     } catch (error) {
-      console.error("Failed to add to cart: ", error);
+      console.error("Failed to remove from cart: ", error);
     }
   };
 
@@ -135,7 +131,7 @@ export default function Cart() {
                 <div key={product.name + index} className="flex items-center p-5 justify-between">
                   <Image src={`/images/${product.path}`} w={120} h={120} radius={"lg"}></Image>
                   <span className="font-semibold underline text-xl">
-                    <Link href={`/products/${product.id}`}>{product.name}</Link>
+                    <Link href={`/product/${product.id}`}>{product.name}</Link>
                   </span>
 
                   <span className="text-lg tracking-tight">
@@ -203,7 +199,10 @@ export default function Cart() {
   }
   else{
     return(
-      <div>Empty Cart</div>
+      <div className="flex flex-col items-center h-[70vh]">
+        <div className="text-2xl font-semibold">Your cart is empty!</div>
+        <Recommended/>
+      </div>
     );
   }
 }

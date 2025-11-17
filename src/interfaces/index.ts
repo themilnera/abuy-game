@@ -21,3 +21,8 @@ export interface SearchProps {
   query: string;
   category: string;
 }
+
+export interface ProductQuantity {
+  product: Product;
+  quantity: number;
+}
