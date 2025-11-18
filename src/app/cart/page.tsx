@@ -6,15 +6,22 @@ import { Button, Image, NumberInput } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
 import axios from "axios";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function Cart() {
+  const router = useRouter();
   const { user, isLoaded } = useUser();
   const [emptyCart, setEmptyCart] = useState(false);
 
   const [cartFetched, setCartFetched] = useState(false);
   const [cartIds, setCartIds] = useState<string[]>();
   const [userCart, setUserCart] = useState<Product[]>([]);
+
+  const [cash, setCash] = useState(0);
+  const [currentDay, setCurrentDay] = useState(1);
+  const [currentDaySeed, setCurrentDaySeed] = useState(0);
+
   const [quantities, setQuantities] = useState<ProductQuantity[]>();
   const [subtotal, setSubtotal] = useState(0);
   const [shipping, setShipping] = useState(0);
@@ -24,20 +31,19 @@ export default function Cart() {
 
   const removeProductFromCart = async (product: Product) => {
     try {
-      const filteredCartIds = cartIds?.filter((id)=> id != product.id );
-      if(filteredCartIds?.length === 0){
+      const filteredCartIds = cartIds?.filter((id) => id != product.id);
+      if (filteredCartIds?.length === 0) {
         setEmptyCart(true);
       }
       setCartIds(filteredCartIds);
       const filteredCartProducts = userCart.filter((p) => p != product);
-      setUserCart(filteredCartProducts)
+      setUserCart(filteredCartProducts);
       const filteredQuantities = quantities?.filter((q) => q.product != product);
       setQuantities(filteredQuantities);
 
       console.log("Filtered cart: ", filteredCartIds);
       const newCartString = filteredCartIds?.join(" ");
-      await axios.put(`/api/user/cart/remove`, { user_id: user?.id, cart_items: newCartString});
-
+      await axios.put(`/api/user/cart/remove`, { user_id: user?.id, cart_items: newCartString });
     } catch (error) {
       console.error("Failed to remove from cart: ", error);
     }
@@ -54,6 +60,14 @@ export default function Cart() {
     try {
       const result = await axios.post(`api/user/cart`, { user_id: user?.id });
       const fetchedCartIds = result.data.rows[0].cart_items.trim().split(" ");
+      const result2 = await axios.get(`/api/user/${user?.id}`);
+
+      if (result2) {
+        setCash(Number(result2.data.rows[0].money));
+        setCurrentDay(Number(result2.data.rows[0].current_day));
+        setCurrentDaySeed(result2.data.rows[0].current_day_seed);
+      }
+
       setCartIds(fetchedCartIds);
       if (fetchedCartIds && fetchedCartIds.length > 0 && fetchedCartIds[0].trim() !== "") {
         const batchResult = await axios.post(`/api/products/batch`, { ids: fetchedCartIds, user_id: user?.id });
@@ -75,8 +89,7 @@ export default function Cart() {
 
           setQuantities(tQuantities);
         }
-      }
-      else{
+      } else {
         setEmptyCart(true);
       }
     } catch (error) {
@@ -103,6 +116,31 @@ export default function Cart() {
       setTotal(tTaxes + tFees + tSubtotal);
       if (!cartFetched) setCartFetched(true);
       console.log("Calculated Totals");
+    }
+  };
+
+  const checkOutAndPushToOwnedPage = async () => {
+    try {
+      const joinedIds = cartIds?.join(" ");
+      if (joinedIds?.trim() != "") {
+        console.log("Adding these products: ", joinedIds);
+        if (cash >= total) {
+          const newCashAmount = cash - total;
+          const userResult = await axios.put(`/api/user/`, { user_id: user?.id, current_day: currentDay, current_day_seed: currentDaySeed, money: newCashAmount });
+          if(userResult){
+            const result = axios.put(`/api/user/owned`, { user_id: user?.id, owned_item_ids: joinedIds });
+            setCartIds([]);
+            setUserCart([]);
+            
+            setEmptyCart(true);
+            router.push("/sell")
+          }
+        } else {
+          console.log("Not enough money, total cash: ", cash);
+        }
+      }
+    } catch (error) {
+      console.log("Failed to checkout: ", error);
     }
   };
 
@@ -134,11 +172,13 @@ export default function Cart() {
                     <Link href={`/product/${product.id}`}>{product.name}</Link>
                   </span>
 
-                  <span className="text-lg tracking-tight">
-                    Quantity:
+                  <span className="text-lg tracking-tight flex items-center gap-5">
+                    <span className="flex-5 text-right">Quantity:</span>
                     <NumberInput
+                      className="flex-2 font-semibold"
                       min={1}
                       max={99}
+                      fw={"bold"}
                       disabled={product.rarity > 3 || false}
                       onChange={(e) => {
                         let filteredQuantities = quantities?.filter((pq) => pq.product.id != product.id) || [];
@@ -151,9 +191,11 @@ export default function Cart() {
                   </span>
 
                   <span className="font-semibold text-xl tracking-tight mr-4">${product.current_price} each</span>
-                  <span className="hover:cursor-pointer" onClick={()=>{
-                    removeProductFromCart(product);
-                  }}>
+                  <span
+                    className="hover:cursor-pointer"
+                    onClick={() => {
+                      removeProductFromCart(product);
+                    }}>
                     <IconTrash />
                   </span>
                 </div>
@@ -183,9 +225,10 @@ export default function Cart() {
             <span className="text-2xl flex justify-between ">
               Total: <span className="">${total}</span>
             </span>
-            <Button size="md" radius={"lg"} className="text-lg! bg-blue-800!">
+            <Button disabled={cash <= total} onClick={checkOutAndPushToOwnedPage} size="md" radius={"lg"} className="text-lg! bg-blue-800!">
               Checkout
             </Button>
+            {cash <= total ? <span className="self-center text-red-800 underline underline-offset-4">You don't have enough money!</span> : <></>}
           </div>
         </div>
       </div>
@@ -196,12 +239,11 @@ export default function Cart() {
         <div className="loader"></div>
       </div>
     );
-  }
-  else{
-    return(
+  } else {
+    return (
       <div className="flex flex-col items-center h-[70vh]">
         <div className="text-2xl font-semibold">Your cart is empty!</div>
-        <Recommended/>
+        <Recommended />
       </div>
     );
   }

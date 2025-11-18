@@ -92,3 +92,4 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
     return NextResponse.json({ error: "Failed to fetch product" }, { status: 500 });
   }
 }
+

@@ -24,6 +24,23 @@ export async function POST(request: NextRequest) {
   }
 }
 
+export async function PUT(request: NextRequest){
+  const body = await request.json();
+  const { user_id, current_day, current_day_seed, money } = body;
+  try {
+    const result = await pool.query(
+      `UPDATE users
+      SET current_day = $2,
+      current_day_seed = $3,
+      money = $4
+      WHERE user_id = $1`
+    ,[user_id, current_day, current_day_seed, money]);
+    return NextResponse.json(result);
+  } catch (error) {
+    console.error("Failed to update user object: ", error);
+  }
+}
+
 function generateSeed() {
   let finalResults = [];
   const possibleCharacters = [

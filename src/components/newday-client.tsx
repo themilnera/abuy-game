@@ -12,6 +12,7 @@ export default function NewDayClient({ availableImages }: { availableImages: str
   const { isLoaded, isSignedIn, user } = useUser();
   const router = useRouter();
   const [newUser, setNewUser] = useState(false);
+  const [userObj, setUserObj] = useState(null);
   const [sellerName, setSellerName] = useState<string>("");
   const [conditionsMet, setCondidionsMet] = useState(false);
   const [dbError, setDbError] = useState(false);
@@ -26,7 +27,9 @@ export default function NewDayClient({ availableImages }: { availableImages: str
       try {
         if (user) {
           const result = await axios.get(`/api/user/${user.id}`);
-          if (result.data.rows.length > 0) {
+          if (result.data.rows.length > 0) setUserObj(result.data.rows[0]);
+
+          if (result.data.rows.length > 0 && result.data.rows[0].current_day && result.data.rows[0].current_day_seed) {
             //check which day it is progress to the next day
           } else {
             setNewUser(true);
@@ -44,8 +47,15 @@ export default function NewDayClient({ availableImages }: { availableImages: str
   const addNewUserToDbAndStart = async () => {
     try {
       setDbError(false);
-      const result = await axios.post("/api/user/", { user_id: user?.id, seller_name: sellerName, seller_image_url: profileImage, current_day: 1, money: 100 });
-      if (result.data) {
+      let result;
+      if (userObj) {
+        console.log("delete")
+        const deleteResult = await axios.delete(`/api/user/${user?.id}`);
+        if(deleteResult) result = await axios.post("/api/user/", { user_id: user?.id, seller_name: sellerName, seller_image_url: profileImage, current_day: 1, money: 100 });
+      } else {
+        result = await axios.post("/api/user/", { user_id: user?.id, seller_name: sellerName, seller_image_url: profileImage, current_day: 1, money: 100 });
+      }
+      if (result?.data) {
         router.push("/");
       }
     } catch (error) {

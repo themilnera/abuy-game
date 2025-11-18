@@ -33,7 +33,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
       if (result.data.product) {
         if (result.data.product.rarity < 3) {
           const sResult = await axios.post(`/api/user/cart`, { user_id: user?.id });
-          const fetchedCartIds: string[] = sResult.data.rows[0].cart_items.trim().split(" ");
+          const fetchedCartIds: string[] = sResult.data.rows[0].cart_items?.trim().split(" ");
           if (fetchedCartIds) {
             fetchedCartIds.forEach((id) => {
               if (id == result.data.product.id) {

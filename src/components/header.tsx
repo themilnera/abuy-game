@@ -38,7 +38,7 @@ export default function Header() {
       try {
         if (user) {
           const result = await axios.get(`/api/user/${user.id}`);
-          if (result.data.rows.length < 1) {
+          if (result.data.rows.length < 1 || !result.data.rows[0].current_day || !result.data.rows[0].current_day_seed) {
             router.push("/new-day");
           } else {
             setSellerName(result.data.rows[0].seller_name);

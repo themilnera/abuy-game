@@ -17,6 +17,15 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     return NextResponse.json({ error: "Failed to fetch user" }, { status: 500 });
   }
 }
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    const { id } = await params;
+    const result = await pool.query(`DELETE FROM users WHERE user_id = $1`, [id]);
+    return NextResponse.json(result);
+  } catch (error) {
+    console.error("Failed to delete user: ", error);
+  }
+}
 
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
