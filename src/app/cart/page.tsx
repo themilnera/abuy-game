@@ -17,6 +17,7 @@ export default function Cart() {
   const [cartFetched, setCartFetched] = useState(false);
   const [cartIds, setCartIds] = useState<string[]>();
   const [userCart, setUserCart] = useState<Product[]>([]);
+  const [ownedItemIds, setOwnedItemIds] = useState<string[]>();
 
   const [cash, setCash] = useState(0);
   const [currentDay, setCurrentDay] = useState(1);
@@ -28,6 +29,14 @@ export default function Cart() {
   const [fees, setFees] = useState(0);
   const [taxes, setTaxes] = useState(0);
   const [total, setTotal] = useState<number>(0);
+
+  const parseQuantitiesIntoString = (pq: ProductQuantity[]) => {
+    let stringArray: string[] = [];
+    pq.forEach((productQuantity) => {
+      stringArray.push(productQuantity.product.id + "&q=" + productQuantity.quantity);
+    });
+    return stringArray;
+  };
 
   const removeProductFromCart = async (product: Product) => {
     try {
@@ -58,6 +67,7 @@ export default function Cart() {
         setCash(Number(userResult.data.rows[0].money));
         setCurrentDay(Number(userResult.data.rows[0].current_day));
         setCurrentDaySeed(userResult.data.rows[0].current_day_seed);
+        setOwnedItemIds(userResult.data.rows[0].owned_items.trim().split(" "));
       }
 
       let justProductIds: string[] = [];
@@ -122,7 +132,6 @@ export default function Cart() {
     try {
       const joinedIds = cartIds?.join(" ");
       if (joinedIds?.trim() != "") {
-        console.log("Adding these products: ", joinedIds);
         if (cash >= total) {
           const newCashAmount = cash - total;
           const userResult = await axios.put(`/api/user/`, {
@@ -132,7 +141,20 @@ export default function Cart() {
             money: newCashAmount,
           });
           if (userResult) {
-            const result = axios.put(`/api/user/owned`, { user_id: user?.id, owned_item_ids: joinedIds });
+            let finalIds: string[] =[]; 
+            ownedItemIds?.forEach(((oId) =>{
+              cartIds?.forEach((cId)=>{
+                const splitOid = oId.trim().split("&q=");
+                const splitCid = cId.trim().split("&q=");
+                if(oId.split("&q=")[0] == cId.split("&q=")[0]){
+                  const fQuantity = Number(splitOid[1]) + Number(splitCid[1]);
+                  finalIds.push(`${splitOid[0]}&q=${fQuantity}`);
+                }
+              })
+            }))
+
+            if(finalIds.length > 0) await axios.put(`/api/user/owned`, { user_id: user?.id, owned_item_ids: finalIds.join(" ")});
+            await axios.put(`/api/user/cart/remove`, { user_id: user?.id, cart_items: "" });
             setCartIds([]);
             setUserCart([]);
 
@@ -189,6 +211,7 @@ export default function Cart() {
                           const newQuantities: ProductQuantity[] = quantities.map((pq: ProductQuantity, i: number) => {
                             return i === index ? { product: pq.product, quantity: Number(e) } : pq;
                           });
+                          setCartIds(parseQuantitiesIntoString(newQuantities));
                           setQuantities(newQuantities);
                         }
                       }}
