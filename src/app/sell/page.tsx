@@ -21,13 +21,13 @@ export default function MyItemsAndSell() {
       const result = await axios.post(`/api/user/owned`, { user_id: user?.id });
       const tempIds = result.data.rows[0].owned_items;
       setOwnedItemIds(tempIds);
-      console.log(tempIds.trim().split(" "))
-      if(result && tempIds){
-        const batchResult = await axios.post(`/api/products/batch`, {ids: tempIds.trim().split(" "),  user_id: user?.id });
-        if(batchResult){
-            console.log(batchResult)
-            setOwnedItems(batchResult.data.rows);
-            setOwnedItemsFetched(true);
+      console.log(tempIds.trim().split(" "));
+      if (result && tempIds) {
+        const batchResult = await axios.post(`/api/products/batch`, { ids: tempIds.trim().split(" "), user_id: user?.id });
+        if (batchResult) {
+          console.log(batchResult);
+          setOwnedItems(batchResult.data.rows);
+          setOwnedItemsFetched(true);
         }
       }
     } catch (error) {
@@ -47,12 +47,16 @@ export default function MyItemsAndSell() {
         <div className="flex flex-col items-center">
           <div className="w-[70%]">
             <div className="text-2xl font-semibold border-b-1 flex flex-col mb-5">Owned Items</div>
-            {ownedItems?.map((product, index)=>{
-                return (
-                <div key={product.name+index} className="w-[100%] flex items-center gap-5">
-                    <Image src={`/images/${product.path}`} radius={"lg"} className="w-70!"/>
-                    <span className="font-semibold flex text-xl">{product.name}</span>
-                </div>);
+            {ownedItems?.map((product, index) => {
+              return (
+                <div
+                  key={product.name + index}
+                  className="w-[100%] flex items-center gap-5 bg-gray-300 p-7 rounded-2xl">
+                  <Image src={`/images/${product.path}`} radius={"lg"} className="w-70!" />
+                  <span className="font-semibold flex text-2xl">{product.name}</span>
+                  <span>You own {} of these</span>
+                </div>
+              );
             })}
           </div>
         </div>

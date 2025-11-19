@@ -31,7 +31,7 @@ export default function Cart() {
 
   const removeProductFromCart = async (product: Product) => {
     try {
-      const filteredCartIds = cartIds?.filter((id) => id != product.id);
+      const filteredCartIds = cartIds?.filter((id) => id.split("&q=")[0] != product.id);
       if (filteredCartIds?.length === 0) {
         setEmptyCart(true);
       }
@@ -41,7 +41,6 @@ export default function Cart() {
       const filteredQuantities = quantities?.filter((q) => q.product != product);
       setQuantities(filteredQuantities);
 
-      console.log("Filtered cart: ", filteredCartIds);
       const newCartString = filteredCartIds?.join(" ");
       await axios.put(`/api/user/cart/remove`, { user_id: user?.id, cart_items: newCartString });
     } catch (error) {
@@ -49,39 +48,39 @@ export default function Cart() {
     }
   };
 
-  const calculateFees = (product: Product) => {
-    if (product.category === "electronics") {
-      setTaxes(taxes + Math.floor(Number(product.current_price) * 0.07)); //7% electronics tax
-      setFees(fees + 7);
-    }
-  };
-
   const fetchUserCart = async () => {
     try {
       const result = await axios.post(`api/user/cart`, { user_id: user?.id });
-      const fetchedCartIds = result.data.rows[0].cart_items.trim().split(" ");
-      const result2 = await axios.get(`/api/user/${user?.id}`);
+      const fetchedCartIds: string[] = result.data.rows[0].cart_items.trim().split(" ");
+      const userResult = await axios.get(`/api/user/${user?.id}`);
 
-      if (result2) {
-        setCash(Number(result2.data.rows[0].money));
-        setCurrentDay(Number(result2.data.rows[0].current_day));
-        setCurrentDaySeed(result2.data.rows[0].current_day_seed);
+      if (userResult) {
+        setCash(Number(userResult.data.rows[0].money));
+        setCurrentDay(Number(userResult.data.rows[0].current_day));
+        setCurrentDaySeed(userResult.data.rows[0].current_day_seed);
+      }
+
+      let justProductIds: string[] = [];
+      if (fetchedCartIds) {
+        fetchedCartIds.forEach((id) => {
+          const idQ = id.split("&q=");
+          justProductIds.push(idQ[0]);
+        });
       }
 
       setCartIds(fetchedCartIds);
-      if (fetchedCartIds && fetchedCartIds.length > 0 && fetchedCartIds[0].trim() !== "") {
-        const batchResult = await axios.post(`/api/products/batch`, { ids: fetchedCartIds, user_id: user?.id });
+      if (justProductIds && justProductIds.length > 0 && justProductIds[0].trim() !== "") {
+        const batchResult = await axios.post(`/api/products/batch`, { ids: justProductIds, user_id: user?.id });
         if (batchResult) {
           const fetchedCart: Product[] = batchResult.data.rows;
           setUserCart(fetchedCart);
-          console.log(fetchedCart);
 
           let tQuantities: ProductQuantity[] = Array(userCart.length);
           fetchedCart.forEach((product, index) => {
             tQuantities[index] = { product: product, quantity: 0 };
             for (let i = 0; i < fetchedCartIds.length; i++) {
-              if (fetchedCartIds[i] == product.id) {
-                tQuantities[index].quantity++;
+              if (fetchedCartIds[i].split("&q=")[0] == product.id) {
+                tQuantities[index].quantity = Number(fetchedCartIds[i].split("&q=")[1]);
               }
             }
             console.log("Quantities: ", tQuantities);
@@ -126,14 +125,19 @@ export default function Cart() {
         console.log("Adding these products: ", joinedIds);
         if (cash >= total) {
           const newCashAmount = cash - total;
-          const userResult = await axios.put(`/api/user/`, { user_id: user?.id, current_day: currentDay, current_day_seed: currentDaySeed, money: newCashAmount });
-          if(userResult){
+          const userResult = await axios.put(`/api/user/`, {
+            user_id: user?.id,
+            current_day: currentDay,
+            current_day_seed: currentDaySeed,
+            money: newCashAmount,
+          });
+          if (userResult) {
             const result = axios.put(`/api/user/owned`, { user_id: user?.id, owned_item_ids: joinedIds });
             setCartIds([]);
             setUserCart([]);
-            
+
             setEmptyCart(true);
-            router.push("/sell")
+            router.push("/sell");
           }
         } else {
           console.log("Not enough money, total cash: ", cash);
@@ -181,10 +185,12 @@ export default function Cart() {
                       fw={"bold"}
                       disabled={product.rarity > 3 || false}
                       onChange={(e) => {
-                        let filteredQuantities = quantities?.filter((pq) => pq.product.id != product.id) || [];
-                        let newPrQuantity: ProductQuantity = { product, quantity: Number(e) };
-                        let newQuantities: ProductQuantity[] = [newPrQuantity, ...filteredQuantities];
-                        setQuantities(newQuantities);
+                        if (quantities) {
+                          const newQuantities: ProductQuantity[] = quantities.map((pq: ProductQuantity, i: number) => {
+                            return i === index ? { product: pq.product, quantity: Number(e) } : pq;
+                          });
+                          setQuantities(newQuantities);
+                        }
                       }}
                       value={quantities && !isNaN(quantities[index].quantity) ? quantities[index].quantity : 1}
                     />

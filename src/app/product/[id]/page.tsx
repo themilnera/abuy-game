@@ -33,7 +33,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
       if (result.data.product) {
         if (result.data.product.rarity < 3) {
           const sResult = await axios.post(`/api/user/cart`, { user_id: user?.id });
-          const fetchedCartIds: string[] = sResult.data.rows[0].cart_items?.trim().split(" ");
+          const fetchedCartIds: string[] = sResult.data.rows[0].cart_items?.trim().split(" "); ////////
           if (fetchedCartIds) {
             fetchedCartIds.forEach((id) => {
               if (id == result.data.product.id) {
@@ -80,7 +80,8 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
   const addProductToCartAndPushToCartPage = async () => {
     try {
       if (!productInCart) {
-        const result = await axios.put(`/api/user/cart`, { user_id: user?.id, cart_item_id: product?.id });
+        const cartString = `${product?.id}&q=1`
+        const result = await axios.put(`/api/user/cart`, { user_id: user?.id, cart_item_id: cartString });
       }
       router.push("/cart");
     } catch (error) {
