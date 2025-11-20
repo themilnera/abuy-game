@@ -4,7 +4,7 @@ import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Product } from "@/interfaces";
+import { ListedItem, Product } from "@/interfaces";
 import { Button, Image, Tooltip, Modal, TextInput, NumberInput, Textarea } from "@mantine/core";
 import { ProductQuantity } from "@/interfaces";
 import { useDisclosure } from "@mantine/hooks";
@@ -17,15 +17,42 @@ export default function MyItemsAndSell() {
   const [ownedItmesFetched, setOwnedItemsFetched] = useState(false);
 
   const [ownedItemIds, setOwnedItemIds] = useState<string[]>();
+  const [listedItems, setListedItems] = useState<ListedItem[]>([]);
+
   const [ownedPqs, setOwnedPqs] = useState<ProductQuantity[]>([]);
   const [opened, { open, close }] = useDisclosure(false);
   const [chosenItem, setChosenItem] = useState<ProductQuantity>();
+
+  const [listedItemName, setListedItemName] = useState("");
+  const [listedItemPrice, setListedItemPrice] = useState(1);
+  const [listedItemQuantity, setListedItemQuantity] = useState(1);
+  const [listedItemDescription, setListedItemDescription] = useState("");
+
+  const getRarityDescription = (rarity: Number) => {
+    if (rarity == 0) {
+      return "(most common)";
+    } else if (rarity == 1) {
+      return "(common)";
+    } else if (rarity == 2) {
+      return "(somewhat common)";
+    } else if (rarity == 3) {
+      return "(somewhat rare)";
+    } else if (rarity == 4) {
+      return "(rare)";
+    } else if (rarity == 5) {
+      return "(very rare)";
+    }
+  };
 
   const fetchOwnedItems = async () => {
     setOwnedItemsFetched(false);
     try {
       const result = await axios.post(`/api/user/owned`, { user_id: user?.id });
-
+      const listedResult = await axios.get(`/api/listed-item/${user?.id}`);
+      const tempListedItems: ListedItem[] = listedResult.data.rows;
+      if (listedResult) {
+        setListedItems(tempListedItems);
+      }
       const tempIds: string[] = result.data.rows[0].owned_items.split(" ");
       setOwnedItemIds(tempIds);
 
@@ -44,29 +71,63 @@ export default function MyItemsAndSell() {
             }
           });
           if (tempPqs.length > 0) setOwnedPqs(tempPqs);
-          setOwnedItemsFetched(true);
         }
-      } else if (tempIds.length === 0 || tempIds[0].trim() === "") {
+      } else if (tempIds.length === 0 || tempIds[0].trim() === "" && tempListedItems.length === 0) {
         setNoItems(true);
       }
+      setOwnedItemsFetched(true);
     } catch (error) {
       console.error("Failed to fetch owned items: ", error);
     }
   };
 
-  const getRarityDescription = (rarity: Number) => {
-    if (rarity == 0) {
-      return "(most common)";
-    } else if (rarity == 1) {
-      return "(common)";
-    } else if (rarity == 2) {
-      return "(somewhat common)";
-    } else if (rarity == 3) {
-      return "(somewhat rare)";
-    } else if (rarity == 4) {
-      return "(rare)";
-    } else if (rarity == 5) {
-      return "(very rare)";
+  const pushToListedItemsTable = async () => {
+    try {
+      if (user && chosenItem) {
+        const userResult = await axios.get(`/api/user/${user.id}`);
+        if (userResult) {
+          const listedItem: ListedItem = {
+            product_name: listedItemName,
+            user_id: user.id,
+            product_id: chosenItem.product.id,
+            description: listedItemDescription,
+            price: listedItemPrice,
+            quantity: listedItemQuantity,
+            gameday_listed: userResult.data.rows[0].current_day,
+            path: chosenItem.product.path,
+          };
+          const lIResult = await axios.post(`/api/listed-item`, { listedItem: listedItem });
+          if (lIResult.status === 200) {
+            console.log("Successful post");
+            setListedItems([listedItem, ...listedItems]);
+
+            let newPqs: ProductQuantity[] = [];
+            let newOwnedString: string[] = [];
+            ownedPqs.forEach((pq) => {
+              console.log("PQ ID: ", pq.product.id);
+              console.log("LIQ ID: ", chosenItem.product.id);
+              if (Number(pq.product.id) === Number(chosenItem.product.id) && pq.quantity - listedItemQuantity > 0) {
+                console.log("Testing true");
+                newPqs.push({ quantity: pq.quantity - listedItemQuantity, product: pq.product });
+                newOwnedString.push(`${pq.product.id}&q=${pq.quantity - listedItemQuantity}`);
+              } else if (Number(pq.product.id) !== Number(chosenItem.product.id)) {
+                newPqs.push({ quantity: pq.quantity, product: pq.product });
+                newOwnedString.push(`${pq.product.id}&q=${pq.quantity}`);
+              }
+            });
+
+            const newUserOwnedResult = await axios.put(`/api/user/owned/remove`, { user_id: user?.id, owned_items: newOwnedString.join(" ") });
+            if (newUserOwnedResult) {
+              console.log("Updating owned items");
+              setOwnedPqs(newPqs);
+              setOwnedItemIds(newOwnedString.map((s) => s.split("&q=")[0]));
+              fetchOwnedItems();
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Failed to push to listed items table: ", error);
     }
   };
 
@@ -102,7 +163,15 @@ export default function MyItemsAndSell() {
                     required
                     label="Product Name"
                     maxLength={50}
-                    defaultValue={chosenItem.product.name}></TextInput>
+                    value={listedItemName}
+                    onBlur={(e) => {
+                      if (e.target.value.trim() == "") {
+                        setListedItemName(chosenItem.product.name);
+                      }
+                    }}
+                    onChange={(e) => {
+                      setListedItemName(e.target.value);
+                    }}></TextInput>
                   <div className="flex justify-end gap-7">
                     <NumberInput
                       radius={"md"}
@@ -110,28 +179,41 @@ export default function MyItemsAndSell() {
                       label="Price"
                       max={999999999}
                       min={1}
-                      defaultValue={Number(chosenItem.product.current_price)}></NumberInput>
+                      onChange={(e) => {
+                        setListedItemPrice(Number(e));
+                      }}
+                      value={listedItemPrice}></NumberInput>
                     <NumberInput
                       radius={"md"}
                       className="text-center w-[30%]"
                       label="Quantity"
                       max={chosenItem.quantity}
                       min={1}
-                      defaultValue={Number(chosenItem.quantity)}></NumberInput>
+                      onChange={(e) => {
+                        setListedItemQuantity(Number(e));
+                      }}
+                      value={listedItemQuantity}></NumberInput>
                   </div>
                 </div>
               </div>
               <Tooltip label="Writing a strong description helps an item sell, keep your target audience in mind.">
                 <span>Description (?)</span>
               </Tooltip>
-              <Textarea maxLength={1000} rows={5} className="w-[80%]! mb-5"></Textarea>
+              <Textarea
+                maxLength={1000}
+                rows={5}
+                className="w-[80%]! mb-5"
+                value={listedItemDescription}
+                onChange={(e) => setListedItemDescription(e.target.value)}></Textarea>
               <Button
                 radius={"lg"}
                 size="md"
-                className="bg-blue-900!"
+                className="bg-blue-900! disabled:bg-gray-600!"
+                disabled={listedItemDescription.trim() == ""}
                 onClick={() => {
                   //submit to db, remove from owned
                   //go below and add a Listed Items section that checks if an owned item is in the listed table
+                  pushToListedItemsTable();
                   close();
                 }}>
                 List Item
@@ -143,7 +225,8 @@ export default function MyItemsAndSell() {
             </div>
           )}
         </Modal>
-        <div className="flex flex-col items-center h-[90vh]">
+
+        <div className="flex flex-col items-center h-[100%] mb-10">
           <div className="w-[70%]">
             <div className="text-2xl font-semibold border-b-1 flex flex-col mb-5">Owned Items</div>
             {ownedPqs?.map((pq, index) => {
@@ -170,6 +253,8 @@ export default function MyItemsAndSell() {
                     className="md:ml-auto bg-blue-900!"
                     onClick={() => {
                       setChosenItem(pq);
+                      setListedItemPrice(Number(pq.product.current_price));
+                      setListedItemQuantity(Number(pq.quantity));
                       open();
                     }}>
                     List This Item
@@ -177,6 +262,27 @@ export default function MyItemsAndSell() {
                 </div>
               );
             })}
+            {listedItems.length > 0 ? (
+              <div>
+                <div className="text-2xl font-semibold border-b-1 flex flex-col mb-5 mt-5">Listed Items</div>
+                {listedItems.map((li, index) => {
+                  return (
+                    <div key={li.product_name + index} className="w-[100%] mt-3 flex md:flex-row flex-col items-center gap-10 bg-[#bdbcbc] p-7 rounded-2xl">
+                      <Image src={`/images/${li.path}`} h={180} radius={"lg"} className="flex-2" />
+                      <span className="font-semibold flex text-2xl">{li.product_name}</span>
+                      <span className="font-semibold">Description: {li.description}</span>
+                      <span className="font-semibold">List Price: ${li.price}</span>
+                      <span className="font-semibold">Quantity: {li.quantity}</span>
+                      <Button radius={"lg"} size="md" className="md:ml-auto bg-red-900!">
+                        Unlist
+                      </Button>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <></>
+            )}
           </div>
         </div>
       </>
