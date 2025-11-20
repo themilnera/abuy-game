@@ -141,25 +141,31 @@ export default function Cart() {
             money: newCashAmount,
           });
           if (userResult) {
-            let finalIds: string[] =[]; 
-            ownedItemIds?.forEach(((oId) =>{
-              cartIds?.forEach((cId)=>{
+            let tCartIds: string[] = [];
+            let foundIds: string[] = [];
+            let finalIds: string[] = [];
+            if (cartIds) tCartIds = cartIds;
+            ownedItemIds?.forEach((oId) => {
+              cartIds?.forEach((cId, index) => {
                 const splitOid = oId.trim().split("&q=");
                 const splitCid = cId.trim().split("&q=");
-                if(oId.split("&q=")[0] == cId.split("&q=")[0]){
+                if (splitOid[0] == splitCid[0]) {
                   const fQuantity = Number(splitOid[1]) + Number(splitCid[1]);
-                  finalIds.push(`${splitOid[0]}&q=${fQuantity}`);
+                  foundIds.push(`${splitOid[0]}&q=${fQuantity}`);
+                  tCartIds.splice(index, 1);
                 }
-              })
-            }))
-
-            if(finalIds.length > 0) await axios.put(`/api/user/owned`, { user_id: user?.id, owned_item_ids: finalIds.join(" ")});
-            await axios.put(`/api/user/cart/remove`, { user_id: user?.id, cart_items: "" });
-            setCartIds([]);
-            setUserCart([]);
-
-            setEmptyCart(true);
-            router.push("/sell");
+              });
+            });
+            finalIds = [...foundIds, ...tCartIds];
+            console.log(finalIds)
+            if (finalIds.length > 0) {
+              await axios.put(`/api/user/owned`, { user_id: user?.id, owned_item_ids: finalIds.join(" ") });
+              await axios.put(`/api/user/cart/remove`, { user_id: user?.id, cart_items: "" });
+              setCartIds([]);
+              setUserCart([]);
+              setEmptyCart(true);
+              router.push("/sell");
+            }
           }
         } else {
           console.log("Not enough money, total cash: ", cash);

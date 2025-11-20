@@ -140,16 +140,16 @@ export default function TestDescription() {
             <div className="loader mt-5"></div>
           )}
           {finishedScoring ? (
-            <div className="flex flex-wrap justify-center w-130 gap-3 mt-5">
-              {score.brash > 0 ? <div className="bg-red-400 p-5">Brash: {score.brash}</div> : <></>}
-              {score.casual > 0 ? <div className="bg-blue-400 p-5">Casual: {score.casual}</div> : <></>}
-              {score.warm > 0 ? <div className="bg-orange-400 p-5">Warm: {score.warm}</div> : <></>}
-              {score.smooth > 0 ? <div className="bg-pink-400 p-5">Smooth: {score.smooth}</div> : <></>}
-              {score.cringe > 0 ? <div className="bg-purple-400 p-5">Cringe: {score.cringe}</div> : <></>}
-              {score.grandiose > 0 ? <div className="bg-emerald-400 p-5">Grandiose: {score.grandiose}</div> : <></>}
-              {score.insane > 0 ? <div className="bg-indigo-500 p-5">Insane: {score.insane}</div> : <></>}
-              {score.literate > 0 ? <div className="bg-green-600 p-5">Literate: {score.literate}</div> : <></>}
-              {score.professional > 0 ? <div className="bg-gray-400 p-5">Professional: {score.professional}</div> : <></>}
+            <div className="flex flex-wrap justify-center w-130 gap-3 mt-5 font-medium">
+              {score.brash > 0 ? <div className="bg-red-400 p-5 rounded-2xl">Brash: {score.brash}</div> : <></>}
+              {score.casual > 0 ? <div className="bg-blue-400 p-5 rounded-2xl">Casual: {score.casual}</div> : <></>}
+              {score.warm > 0 ? <div className="bg-orange-400 p-5 rounded-2xl">Warm: {score.warm}</div> : <></>}
+              {score.smooth > 0 ? <div className="bg-pink-400 p-5 rounded-2xl">Smooth: {score.smooth}</div> : <></>}
+              {score.cringe > 0 ? <div className="bg-purple-400 p-5 rounded-2xl">Cringe: {score.cringe}</div> : <></>}
+              {score.grandiose > 0 ? <div className="bg-emerald-400 p-5 rounded-2xl">Grandiose: {score.grandiose}</div> : <></>}
+              {score.insane > 0 ? <div className="bg-indigo-500 p-5 rounded-2xl">Insane: {score.insane}</div> : <></>}
+              {score.literate > 0 ? <div className="bg-green-600 p-5 rounded-2xl">Literate: {score.literate}</div> : <></>}
+              {score.professional > 0 ? <div className="bg-gray-400 p-5 rounded-2xl">Professional: {score.professional}</div> : <></>}
               {/* Neutral */}
               {score.brash === 0 &&
               score.warm === 0 &&

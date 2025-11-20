@@ -114,11 +114,12 @@ export default function Bids() {
               })}
             </div>
           </div>
+          <div className="text-md">Note: If you don't have the funds needed to pay out your bid when it sells, the item will be sold to the next highest bidder.</div>
         </div>
       </>
     );
   } else if (!emptyBidsList) {
-    return <div className="loader"></div>;
+    return <div className="flex flex-col items-center h-[90vh]"><div className="loader"></div></div>;
   } else {
     return <div className="flex flex-col items-center h-[70vh]">
             <div className="text-2xl font-semibold">You have no active bids!</div>

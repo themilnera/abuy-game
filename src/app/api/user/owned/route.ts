@@ -12,7 +12,7 @@ export async function PUT(request: NextRequest) {
     const result = await pool.query(
       `
       UPDATE users
-      SET owned_items = COALESCE(bid_items, '') || $2
+      SET owned_items = COALESCE(owned_items, '') || $2
       WHERE user_id = $1
       RETURNING *
       `,
