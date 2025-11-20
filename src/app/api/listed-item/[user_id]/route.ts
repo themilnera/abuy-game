@@ -20,3 +20,4 @@ export async function GET(request: NextRequest, { params }: { params: { user_id:
     return NextResponse.json({error: "Failed to fetch listed items by user_id"}, {status: 500})
   }
 }
+

@@ -14,7 +14,8 @@ export async function POST(request: NextRequest) {
       `
         INSERT INTO 
         listed_items (product_name, user_id, product_id, description, price, quantity, gameday_listed, path) 
-        VALUES($1, $2, $3, $4, $5, $6, $7, $8)`,
+        VALUES($1, $2, $3, $4, $5, $6, $7, $8)
+        RETURNING *`,
       [listedItem.product_name, listedItem.user_id, listedItem.product_id, listedItem.description, listedItem.price, listedItem.quantity, listedItem.gameday_listed, listedItem.path]
     );
     return NextResponse.json(result);

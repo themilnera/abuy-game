@@ -81,6 +81,38 @@ export default function MyItemsAndSell() {
     }
   };
 
+  const pushBackToOwnedItems = async (li: ListedItem) =>{
+    try {
+      setListedItems(listedItems.filter((it)=> it !== li));
+      let newPqs: ProductQuantity[] = [];
+      let prodFound = false;
+      if(ownedPqs.length > 0){
+        ownedPqs.forEach((pq)=>{
+          if(pq.product.id == li.product_id){
+            newPqs.push({ product: pq.product, quantity: pq.quantity + li.quantity});
+            prodFound = true;
+          }
+          else{
+            newPqs.push(pq);
+          }
+        });
+      }
+      if(!prodFound){
+        const pResult = await axios.post(`/api/products/${li.product_id}`, { userId: user?.id });
+        if(pResult){
+          const pr: Product = pResult.data.product;
+          newPqs.push({product: pr, quantity: li.quantity});
+        }
+      }
+      setOwnedPqs(newPqs);
+      const newString = newPqs.map((pq)=>`${pq.product.id}&q=${pq.quantity}`).join(" ");
+      await axios.put(`/api/user/owned/remove`, { user_id: user?.id, owned_items: newString})
+      await axios.delete(`/api/listed-item/delete/${li.id}`);
+    } catch (error) {
+      console.error("Failed to push back to owned items: ", error);
+    }
+  }
+
   const pushToListedItemsTable = async () => {
     try {
       if (user && chosenItem) {
@@ -98,7 +130,9 @@ export default function MyItemsAndSell() {
           };
           const lIResult = await axios.post(`/api/listed-item`, { listedItem: listedItem });
           if (lIResult.status === 200) {
-            console.log("Successful post");
+            const returnedItem = lIResult.data.rows[0];
+            console.log("ID RETURNED: "+returnedItem.id);
+            listedItem.id = returnedItem.id;
             setListedItems([listedItem, ...listedItems]);
 
             let newPqs: ProductQuantity[] = [];
@@ -121,7 +155,7 @@ export default function MyItemsAndSell() {
               console.log("Updating owned items");
               setOwnedPqs(newPqs);
               setOwnedItemIds(newOwnedString.map((s) => s.split("&q=")[0]));
-              fetchOwnedItems();
+              //fetchOwnedItems();
             }
           }
         }
@@ -226,7 +260,7 @@ export default function MyItemsAndSell() {
           )}
         </Modal>
 
-        <div className="flex flex-col items-center h-[100%] mb-10">
+        <div className="flex flex-col items-center h-[90vh] mb-10">
           <div className="w-[70%]">
             <div className="text-2xl font-semibold border-b-1 flex flex-col mb-5">Owned Items</div>
             {ownedPqs?.map((pq, index) => {
@@ -273,7 +307,9 @@ export default function MyItemsAndSell() {
                       <span className="font-semibold">Description: {li.description}</span>
                       <span className="font-semibold">List Price: ${li.price}</span>
                       <span className="font-semibold">Quantity: {li.quantity}</span>
-                      <Button radius={"lg"} size="md" className="md:ml-auto bg-red-900!">
+                      <Button radius={"lg"} size="md" className="md:ml-auto bg-red-900!" onClick={()=>{
+                        pushBackToOwnedItems(li);
+                      }}>
                         Unlist
                       </Button>
                     </div>
