@@ -210,7 +210,7 @@ export default function MyItemsAndSell() {
                     <NumberInput
                       radius={"md"}
                       className="text-center w-[40%]"
-                      label="Price"
+                      label={chosenItem.product.rarity > 2 ? "Starting Bid" : "Price"}
                       max={999999999}
                       min={1}
                       onChange={(e) => {
