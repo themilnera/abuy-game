@@ -20,29 +20,27 @@ export default function Bids() {
   const [bidIds, setBidIds] = useState<string[]>();
   const [bids, setBids] = useState<Bid[]>([]);
 
-  const removeUserBid = async(bid: Bid) =>{
+  const removeUserBid = async (bid: Bid) => {
     try {
-      const filteredBidIds = bidIds?.filter((id)=>{
-        return id.split('&bid=')[0] !== bid.product.id && id.split('&bid=')[1] !== bid.amount.toString()
+      const filteredBidIds = bidIds?.filter((id) => {
+        return id.split("&bid=")[0] !== bid.product.id && id.split("&bid=")[1] !== bid.amount.toString();
       });
-      if(filteredBidIds?.length === 0){
+      if (filteredBidIds?.length === 0) {
         setEmptyBidsList(true);
       }
       setBidIds(filteredBidIds);
       const filteredBidProducts = bids.filter((b) => b != bid);
-      setBids(filteredBidProducts)
+      setBids(filteredBidProducts);
       const newBidString = filteredBidIds?.join(" ");
-      await axios.put(`/api/user/bid/remove`, { user_id: user?.id, cart_items: newBidString});
-
+      await axios.put(`/api/user/bid/remove`, { user_id: user?.id, cart_items: newBidString });
     } catch (error) {
       console.error("Failed to remove bid: ", error);
     }
-  }
+  };
 
   const fetchUserBids = async () => {
     try {
       const result = await axios.post(`api/user/bid`, { user_id: user?.id });
-      console.log(result);
       const fetchedBidIds: string[] = result.data.rows[0].bid_items?.trim().split(" ");
       setBidIds(fetchedBidIds);
 
@@ -56,13 +54,12 @@ export default function Bids() {
         });
 
         const batchResult = await axios.post(`/api/products/batch`, { ids: productIds, user_id: user?.id });
+        
         if (batchResult) {
           let tempBids: Bid[] = [];
-          const fetchedProducts: Product[] = batchResult.data.rows;
-          for (let i = 0; i < fetchedProducts.length; i++) {
-            tempBids.push({ product: fetchedProducts[i], amount: bidAmounts[i] });
+          for(let i = 0; i < productIds.length; i++){
+            tempBids.push({ product: batchResult.data.rows.find(p => p.id == productIds[i]), amount: bidAmounts[i]})
           }
-          console.log("Bids object: ", tempBids);
           setBids(tempBids);
         }
       } else {
@@ -93,17 +90,26 @@ export default function Bids() {
                       <div className="flex items-center gap-5">
                         <Image src={`/images/${bid.product.path}`} w={120} h={120} radius={"lg"}></Image>
                         <span className="font-semibold md:text-xl text-md text-center p-3 ">
-                          <Link className="hover:underline underline-offset-5" href={`/product/${bid.product.id}`}>{bid.product.name}</Link>
+                          <Link className="hover:underline underline-offset-5" href={`/product/${bid.product.id}`}>
+                            {bid.product.name}
+                          </Link>
                         </span>
                       </div>
                       <div className="flex items-center gap-5 md:mt-0 mt-5">
-                        <span className="flex items-center font-semibold md:text-xl text-md text-center tracking-tight mr-4 border-b-1 gap-5"><span className="font-medium">Current Bid:</span> <span className="font-bold">${bid.amount}</span></span>
+                        <span className="flex items-center font-semibold md:text-xl text-md text-center tracking-tight mr-4 border-b-1 gap-5">
+                          <span className="font-medium">Current Bid:</span> <span className="font-bold">${bid.amount}</span>
+                        </span>
                         <span
                           className="hover:cursor-pointer"
                           onClick={() => {
                             //removeProductFromCart(product);
                           }}>
-                          <Button radius={"lg"} bg={"#661919"} onClick={()=>{removeUserBid(bid)}}>
+                          <Button
+                            radius={"lg"}
+                            bg={"#661919"}
+                            onClick={() => {
+                              removeUserBid(bid);
+                            }}>
                             Cancel Bid
                           </Button>
                         </span>
@@ -114,16 +120,24 @@ export default function Bids() {
               })}
             </div>
           </div>
-          <div className="text-md">Note: If you don't have the funds needed to pay out your bid when it sells, the item will be sold to the next highest bidder.</div>
+          <div className="text-md">
+            Note: If you don't have the funds needed to pay out your bid when it sells, the item will be sold to the next highest bidder.
+          </div>
         </div>
       </>
     );
   } else if (!emptyBidsList) {
-    return <div className="flex flex-col items-center h-[90vh]"><div className="loader"></div></div>;
+    return (
+      <div className="flex flex-col items-center h-[90vh]">
+        <div className="loader"></div>
+      </div>
+    );
   } else {
-    return <div className="flex flex-col items-center h-[70vh]">
-            <div className="text-2xl font-semibold">You have no active bids!</div>
-            <Recommended/>
-          </div>
+    return (
+      <div className="flex flex-col items-center h-[70vh]">
+        <div className="text-2xl font-semibold">You have no active bids!</div>
+        <Recommended />
+      </div>
+    );
   }
 }
