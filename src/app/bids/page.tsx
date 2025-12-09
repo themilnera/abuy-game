@@ -1,6 +1,6 @@
 "use client";
 import Recommended from "@/components/recommended";
-import { Product, ProductQuantity } from "@/interfaces";
+import { Product, ProductQuantity, Bid } from "@/interfaces";
 import { useUser } from "@clerk/nextjs";
 import { Button, Image, NumberInput } from "@mantine/core";
 import { IconCancel, IconTrash } from "@tabler/icons-react";
@@ -8,15 +8,10 @@ import axios from "axios";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-interface Bid {
-  product: Product;
-  amount: number;
-}
 
 export default function Bids() {
   const { user, isLoaded } = useUser();
   const [emptyBidsList, setEmptyBidsList] = useState(false);
-  const [bidsFetched, setBidsFetched] = useState(false);
   const [bidIds, setBidIds] = useState<string[]>();
   const [bids, setBids] = useState<Bid[]>([]);
 

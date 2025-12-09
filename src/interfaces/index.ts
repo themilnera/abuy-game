@@ -38,3 +38,22 @@ export interface ProductQuantity {
   product: Product;
   quantity: number;
 }
+
+export interface Bid {
+  product: Product;
+  amount: number;
+}
+
+export interface UserObj { 
+  user_id: string;
+  seller_name: string;
+  seller_image_url: string;
+  cart_items: string;
+  current_day: string;
+  current_day_seed: string;
+  owned_items: string;
+  listed_items: string;
+  money: number;
+  bid_items: string;
+  watchlist_items: string;
+}
