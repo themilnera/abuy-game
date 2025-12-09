@@ -22,4 +22,4 @@ This project uses:
 
 ## Status
 
-This is currently a work in progress, and isn't too far along yet. I'm not sure how big and complex this site will really be, I've never made anything like this before, but I'm going to focus on it for a while and try to get it to a functional point before I move on to any other projects.
+- Project should be functional in a basic state in not too long, mainly the first goal met. Some simulation aspects I've found will probably be out of scope for a project like this, time based simulation for example would be much easier to write and manage in a dedicated piece of software written in something like C# vs a NextJS site. The goal was something presentable as a site, and to practice with React/NextJS, but I'd like to flesh it out more fully at some point beyond the basics. For now, I'm planning to get it basically working and bug free before taking a break to work on other projects.
