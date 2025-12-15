@@ -12,8 +12,10 @@ import { IconMoonStars } from "@tabler/icons-react";
 export default function NewDayClient({ availableImages }: { availableImages: string[] }) {
   const { isLoaded, isSignedIn, user } = useUser();
   const router = useRouter();
+  const [finalResults, setFinalResults] = useState(false);
+  const [finalResultsStrings, setFinalResultsString] = useState<string[]>([]);
   const [newUser, setNewUser] = useState(false);
-  const [userObj, setUserObj] = useState<UserObj|null>(null);
+  const [userObj, setUserObj] = useState<UserObj | null>(null);
   const [sellerName, setSellerName] = useState<string>();
   const [conditionsMet, setCondidionsMet] = useState(false);
   const [dbError, setDbError] = useState(false);
@@ -23,7 +25,7 @@ export default function NewDayClient({ availableImages }: { availableImages: str
 
   const [opened, { open, close }] = useDisclosure(false);
   const [noItems, setNoItems] = useState(false);
-  const [ownedItmesFetched, setOwnedItemsFetched] = useState(false);
+  const [ownedItemsFetched, setOwnedItemsFetched] = useState(false);
 
   const [ownedItemIds, setOwnedItemIds] = useState<string[]>();
   const [listedItems, setListedItems] = useState<ListedItem[]>([]);
@@ -145,11 +147,11 @@ export default function NewDayClient({ availableImages }: { availableImages: str
         });
 
         const batchResult = await axios.post(`/api/products/batch`, { ids: productIds, user_id: user?.id });
-        
+
         if (batchResult) {
           let tempBids: Bid[] = [];
-          for(let i = 0; i < productIds.length; i++){
-            tempBids.push({ product: batchResult.data.rows.find(p => p.id == productIds[i]), amount: bidAmounts[i]})
+          for (let i = 0; i < productIds.length; i++) {
+            tempBids.push({ product: batchResult.data.rows.find((p) => p.id == productIds[i]), amount: bidAmounts[i] });
           }
           setBids(tempBids);
         }
@@ -158,6 +160,98 @@ export default function NewDayClient({ availableImages }: { availableImages: str
       }
     } catch (error) {
       console.error("Failed to fetch user bids: ", error);
+    }
+  };
+
+  const sellItemsAndResolveBids = async () => {
+    try {
+      let moneyEarned = 0;
+      let moneySpent = 0;
+      let newOwnedItems: string[] = [...(ownedItemIds || [])];
+      let sellOrBidResults: string[] = [];
+
+      for (const item of listedItems) {
+        const product = await axios.post(`/api/products/${item.product_id}`, { userId: user?.id });
+        const avgPrice = (product.data.product.lowest_price + product.data.product.highest_price) / 2;
+        const rarityBonus = product.data.product.rarity * 0.1;
+        const priceMultiplier = avgPrice / item.price;
+        const sellChance = Math.min(0.9, 0.3 + rarityBonus + priceMultiplier * 0.2);
+
+        let unitsSold = 0;
+        for (let i = 0; i < item.quantity; i++) {
+          if (Math.random() < sellChance) unitsSold++;
+        }
+
+        if (unitsSold > 0) {
+          moneyEarned += unitsSold * item.price;
+          if (unitsSold < item.quantity) {
+            const remainingQty = item.quantity - unitsSold;
+            const existingIndex = newOwnedItems.findIndex((id) => id.split("&q=")[0] === item.product_id);
+
+            if (existingIndex >= 0) {
+              const [prodId, qty] = newOwnedItems[existingIndex].split("&q=");
+              newOwnedItems[existingIndex] = `${prodId}&q=${Number(qty) + remainingQty}`;
+            } else {
+              newOwnedItems.push(`${item.product_id}&q=${remainingQty}`);
+            }
+          }
+        } else {
+          const existingIndex = newOwnedItems.findIndex((id) => id.split("&q=")[0] === item.product_id);
+
+          if (existingIndex >= 0) {
+            const [prodId, qty] = newOwnedItems[existingIndex].split("&q=");
+            newOwnedItems[existingIndex] = `${prodId}&q=${Number(qty) + item.quantity}`;
+          } else {
+            newOwnedItems.push(`${item.product_id}&q=${item.quantity}`);
+          }
+        }
+        sellOrBidResults.push(item.product_name + ": Sold " + unitsSold + " units");
+        await axios.delete(`/api/listed-item/delete/${item.id}`);
+      }
+
+      const newBidIds: string[] = [];
+      for (const bid of bids) {
+        const avgPrice = (bid.product.lowest_price + bid.product.highest_price) / 2;
+        const bidRatio = bid.amount / avgPrice;
+
+        const winChance = Math.min(0.95, 0.2 + bidRatio * 0.4);
+
+        if (Math.random() < winChance && userObj && userObj.money + moneyEarned - moneySpent >= bid.amount) {
+          moneySpent += bid.amount;
+
+          const existingIndex = newOwnedItems.findIndex((id) => id.split("&q=")[0] === bid.product.id);
+
+          if (existingIndex >= 0) {
+            const [prodId, qty] = newOwnedItems[existingIndex].split("&q=");
+            newOwnedItems[existingIndex] = `${prodId}&q=${Number(qty) + 1}`;
+          } else {
+            newOwnedItems.push(`${bid.product.id}&q=1`);
+          }
+          sellOrBidResults.push("Won bid for: " + bid.product.name);
+        }
+      }
+      const newMoney = (userObj?.money || 0) + moneyEarned - moneySpent;
+      await axios.put(`/api/user/`, {
+        user_id: user?.id,
+        current_day: (Number(userObj?.current_day) || 1) + 1,
+        money: newMoney,
+      });
+
+      await axios.put(`/api/user/owned`, {
+        user_id: user?.id,
+        owned_item_ids: newOwnedItems.join(" "),
+      });
+
+      await axios.put(`/api/user/bid/remove`, {
+        user_id: user?.id,
+        cart_items: newBidIds.join(" "),
+      });
+      if(sellOrBidResults.length > 0) setFinalResultsString(sellOrBidResults);
+      else setFinalResultsString(["You didn't win any bids or make any sales :("]);
+      setFinalResults(true);
+      //router.push("/");
+    } catch (error) {
+      console.error("Failed to process end of day: ", error);
     }
   };
 
@@ -251,6 +345,23 @@ export default function NewDayClient({ availableImages }: { availableImages: str
             </div>
           </div>
         </div>
+      ) : finalResults ? (
+        <>
+          <div className="h-[100vh] bg-[#151529]">
+            <div className="flex flex-col items-center justify-center mt-50">
+              {finalResultsStrings.map((item, index) => {
+                return (
+                  <div className="text-white text-2xl mt-5" key={"res" + index}>
+                    {item}
+                  </div>
+                );
+              })}
+            <Button onClick={() => router.push("/")} className="bg-[#106b3b]! mt-5 hover:bg-[#084a27]!" size="md" radius={"lg"} fz={"lg"}>
+              Home
+            </Button>
+            </div>
+          </div>
+        </>
       ) : (
         <>
           <div className="h-[100vh] bg-[#151529]">
@@ -260,13 +371,14 @@ export default function NewDayClient({ availableImages }: { availableImages: str
               </div>
               <Image src={profileImage} className="w-[400]! rounded-2xl! mt-5"></Image>
               <div className="text-white text-2xl mt-5">{user?.username}</div>
-              
-              {userObj ? (<>
-                <span className="text-[#0c6a00] text-2xl">${userObj.money}</span>
-                <span className="border-b-1 w-[70%] mt-5 border-gray-300"></span>
-                <div className="flex flex-row gap-10 mt-5">
-                  <div>
-                    <div className="text-white text-xl underline flex flex-col items-center">You Listed:</div>
+
+              {userObj ? (
+                <>
+                  <span className="text-[#0c6a00] text-2xl">${userObj.money}</span>
+                  <span className="border-b-1 w-[70%] mt-5 border-gray-300"></span>
+                  <div className="flex flex-row gap-10 mt-5">
+                    <div>
+                      <div className="text-white text-xl underline flex flex-col items-center">You Listed:</div>
                       {listedItems?.map((p, index) => {
                         return (
                           <div key={p.product_name + index} className="text-white text-lg">
@@ -274,31 +386,42 @@ export default function NewDayClient({ availableImages }: { availableImages: str
                           </div>
                         );
                       })}
-                  </div>
-                  <div>
-                    <div className="text-white text-xl underline flex flex-col items-center">You Own:</div>
-                    {ownedPqs?.map((pq, index) => {
+                    </div>
+                    <div>
+                      <div className="text-white text-xl underline flex flex-col items-center">You Own:</div>
+                      {ownedPqs?.map((pq, index) => {
                         return (
                           <div key={pq.product.name + index} className="text-white text-lg">
                             {pq.product.name} ({pq.quantity})
                           </div>
                         );
                       })}
-                  </div>
-                  <div>
-                    <div className="text-white text-xl underline flex flex-col items-center">You Bid On:</div>
-                    {bids?.map((bid, index) => {
+                    </div>
+                    <div>
+                      <div className="text-white text-xl underline flex flex-col items-center">You Bid On:</div>
+                      {bids?.map((bid, index) => {
                         return (
                           <div key={bid.product.name + index} className="text-white text-lg">
                             {bid.product.name} (${bid.amount})
                           </div>
                         );
                       })}
+                    </div>
                   </div>
-                </div>
-                <Button className="bg-red-900! mt-10 hover:bg-[#6e0e0e]!" size="md" radius={"lg"} fz={"lg"}>Progress To Next Day</Button>
-                <Button onClick={()=>router.push("/")} className="bg-[#106b3b]! mt-5 hover:bg-[#084a27]!" size="md" radius={"lg"} fz={"lg"}>Go Back</Button>
-              </>) : (
+                  <Button
+                    onClick={sellItemsAndResolveBids}
+                    disabled={!ownedItemsFetched}
+                    className="bg-red-900! mt-10 hover:bg-[#6e0e0e]!"
+                    size="md"
+                    radius={"lg"}
+                    fz={"lg"}>
+                    Progress To Next Day
+                  </Button>
+                  <Button onClick={() => router.push("/")} className="bg-[#106b3b]! mt-5 hover:bg-[#084a27]!" size="md" radius={"lg"} fz={"lg"}>
+                    Go Back
+                  </Button>
+                </>
+              ) : (
                 <></>
               )}
             </div>
