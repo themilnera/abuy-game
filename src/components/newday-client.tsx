@@ -167,7 +167,7 @@ export default function NewDayClient({ availableImages }: { availableImages: str
     try {
       let moneyEarned = 0;
       let moneySpent = 0;
-      let newOwnedItems: string[] = [...(ownedItemIds || [])];
+      let newOwnedItems: string[] = (ownedItemIds || []).filter(id => id && id.trim());
       let sellOrBidResults: string[] = [];
 
       for (const item of listedItems) {
@@ -239,12 +239,12 @@ export default function NewDayClient({ availableImages }: { availableImages: str
 
       await axios.put(`/api/user/owned`, {
         user_id: user?.id,
-        owned_item_ids: newOwnedItems.join(" "),
+        owned_item_ids: newOwnedItems.filter(id => id && id.trim()).join(" "),
       });
 
       await axios.put(`/api/user/bid/remove`, {
         user_id: user?.id,
-        cart_items: newBidIds.join(" "),
+        bid_items: ""
       });
       if(sellOrBidResults.length > 0) setFinalResultsString(sellOrBidResults);
       else setFinalResultsString(["You didn't win any bids or make any sales :("]);

@@ -26,7 +26,7 @@ export default function RootLayout({
         <head>
           <ColorSchemeScript />
         </head>
-        <body className={`${inter.className} antialiased flex flex-col overflow-x-hidden`}>
+        <body className={`${inter.className} antialiased flex flex-col min-h-screen overflow-x-hidden`}>
           <MantineProvider>
             <Header />
             {children}

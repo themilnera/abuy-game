@@ -26,8 +26,8 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest){
   const body = await request.json();
-  const { user_id, current_day, money } = body;
-  const current_day_seed = generateSeed();
+  let { user_id, current_day, current_day_seed, money } = body;
+  if(!current_day_seed) current_day_seed = generateSeed();
   try {
     const result = await pool.query(
       `UPDATE users

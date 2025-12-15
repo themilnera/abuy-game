@@ -54,6 +54,7 @@ export default function MyItemsAndSell() {
         setListedItems(tempListedItems);
       }
       const tempIds: string[] = result.data.rows[0].owned_items.split(" ");
+      console.log(result.data.rows[0].owned_items);
       setOwnedItemIds(tempIds);
 
       let productIdsOnly = tempIds.map((id) => id.split("&q=")[0]);
@@ -260,7 +261,7 @@ export default function MyItemsAndSell() {
           )}
         </Modal>
 
-        <div className="flex flex-col items-center h-[90vh] mb-10">
+        <div className="flex flex-col items-center mb-10">
           <div className="w-[70%]">
             <div className="text-2xl font-semibold border-b-1 flex flex-col mb-5">Owned Items</div>
             {ownedPqs?.map((pq, index) => {
