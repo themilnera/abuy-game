@@ -1,6 +1,6 @@
 # ABUY
 
-ABUY is (will be) satirical management sim game/website inspired by old school Ebay.
+ABUY is a management sim game/website inspired by old school Ebay.
 
 **Can you buy, auction and sell your way to profit?**
 
